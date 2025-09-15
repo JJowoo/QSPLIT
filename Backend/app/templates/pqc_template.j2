@@ -1,0 +1,31 @@
+import torch
+import torch.nn as nn
+import torchquantum as tq
+
+class {{ class_name }}(nn.Module):
+    def __init__(self, n_qubits={{ n_qubits }}):
+        super().__init__()
+        self.qdevice = tq.QuantumDevice(n_wires=n_qubits)
+        self.pqc = tq.QuantumModuleList([
+            {% for layer in layers %}
+            {% if layer in ["RY", "RX", "RZ", "Rot", "U3", "CU3"] %}
+                {% for i in range(n_qubits) %}
+                tq.{{ layer }}(has_params=True,trainable=True, wires={{ i }}),
+                {% endfor %}
+            {% elif layer in ["CNOT", "CZ", "CX", "CY", "SWAP", "CRX", "CRZ"] %}
+                tq.{{ layer }}(wires=[0, 1]),
+            {% elif "Layer" in layer or "Entangle" in layer %}
+                tq.{{ layer }}(arch={"n_wires": {{ n_qubits }}, "n_blocks": 2}),
+            {% else %}
+                {% for i in range(n_qubits) %}
+                tq.{{ layer }}(wires={{ i }}),
+                {% endfor %}
+            {% endif %}
+            {% endfor %}
+        ])
+
+    def forward(self, x=None):
+        self.qdevice.reset_states(bsz=1)
+        for op in self.pqc:
+            op(self.qdevice)
+        return self.qdevice.get_states_1d()

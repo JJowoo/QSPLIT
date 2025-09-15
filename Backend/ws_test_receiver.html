@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head><title>Log Viewer</title></head>
+<body>
+  <h2>Live Logs</h2>
+  <div id="logDisplay" style="font-family:monospace;"></div>
+
+  <script>
+    const ws = new WebSocket("ws://localhost:8000/ws/logs");
+    ws.onmessage = (event) => {
+      const msg = JSON.parse(event.data);
+      document.getElementById("logDisplay").innerHTML += `<div>${msg.message}</div>`;
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+{
+  "layer_list": [
+    "U3",
+    "RX",
+    "CNOT"
+  ],
+  "entanglement_type": "CNOT"
+}
