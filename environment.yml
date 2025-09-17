@@ -1,0 +1,37 @@
+name: QSPLIT
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - pytorch
+  - torchvision
+  - tensorflow
+  - numpy
+  - pandas
+  - scipy
+  - scikit-learn
+  - scikit-image
+  - matplotlib
+  - h5py
+  - pip:
+    - qiskit
+    - qiskit-aer
+    - qiskit-ibm-provider
+    - torchquantum
+    - pyscf
+    - keras
+    - medmnist
+    - tensorpack
+    - torchdiffeq
+    - torchpack
+    - fastapi
+    - uvicorn
+    - loguru
+    - tqdm
+    - fire
+    - dill
+    - python-multipart
