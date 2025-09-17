@@ -4,7 +4,7 @@ class DummyGeneration extends StatelessWidget {
   final List<String> dummyList;
   final List<Map<String, dynamic>> dummyData;
   final String selectedDummyCode;
-  final Set<String> selectedDummyCodes; // 추가: PartSelection에서 선택된 Dummy Code들
+  final Set<String> selectedDummyCodes;
   final VoidCallback onRunPressed;
   final Function(String) onDummyCodeChanged;
 
@@ -22,7 +22,6 @@ class DummyGeneration extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
-    // 선택된 더미의 info에서 존재하는 파트만 추출
     final selectedDummy = dummyData.firstWhere(
         (e) => e['dummy_id'] == selectedDummyCode,
         orElse: () => <String, dynamic>{'info': <String, dynamic>{}});
@@ -108,8 +107,7 @@ class DummyGeneration extends StatelessWidget {
                               final code = entry.value;
                               final isGood = code == 'PQC' || code == 'SE';
                               return [
-                                if (index > 0)
-                                  const SizedBox(width: 20), // 파트 간 간격
+                                if (index > 0) const SizedBox(width: 20),
                                 Expanded(
                                   child: Row(
                                     children: [
@@ -124,7 +122,6 @@ class DummyGeneration extends StatelessWidget {
                                           fit: BoxFit.contain,
                                         ),
                                       ),
-                                      // 정보 박스
                                       Expanded(
                                         child: Container(
                                           height: 250,

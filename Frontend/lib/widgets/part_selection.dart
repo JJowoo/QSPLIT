@@ -69,15 +69,12 @@ class _PartSelectionState extends State<PartSelection> {
       // 파일 내용 읽기
       String fileContent = '';
       if (_selectedFile!.bytes != null) {
-        // 웹에서 선택된 파일
         fileContent = utf8.decode(_selectedFile!.bytes!);
       } else if (_selectedFile!.path != null) {
-        // 데스크톱/모바일에서 선택된 파일
         File file = File(_selectedFile!.path!);
         fileContent = await file.readAsString();
       }
 
-      // home_screen.dart의 upload API 호출
       if (widget.onUploadPythonFile != null) {
         widget.onUploadPythonFile!(
           _selectedFile!.name,
@@ -270,7 +267,6 @@ class _PartSelectionState extends State<PartSelection> {
               ),
               const SizedBox(width: 12),
 
-              // Dummy Code (자동 선택 - 읽기 전용)
               Expanded(
                 child: Container(
                   padding:

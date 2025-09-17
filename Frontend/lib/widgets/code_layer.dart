@@ -21,8 +21,7 @@ class CodeLayer extends StatelessWidget {
     ];
 
     return Container(
-      constraints:
-          const BoxConstraints(minHeight: 360), // HyperparameterConfig와 높이 맞춤
+      constraints: const BoxConstraints(minHeight: 360),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.05),
@@ -40,7 +39,7 @@ class CodeLayer extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Container(
-            height: 280, // 높이 늘림
+            height: 280,
             decoration: BoxDecoration(
               color: Colors.blueGrey.shade800.withOpacity(0.4),
               borderRadius: BorderRadius.circular(10),

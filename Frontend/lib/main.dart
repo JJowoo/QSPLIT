@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-import './screens/home_screen.dart'; // 경로 중요
+import './screens/home_screen.dart';
 
 // 클래스 멤버로 선언
 WebSocketChannel? _logChannel;
@@ -47,7 +47,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const QuantumHomePage(), // 홈 화면으로 연결
+      home: const QuantumHomePage(),
       debugShowCheckedModeBanner: false,
     );
   }
