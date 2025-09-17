@@ -66,6 +66,7 @@ The *Results* section displays the classification accuracy for each combination 
 ```bash
 # create & activate venv (example)
 python -m venv .venv
+pip install -r requirements.txt
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
 ```
 ```bash
