@@ -2,26 +2,6 @@ from jinja2 import Environment, FileSystemLoader
 from pathlib import Path
 import json
 
-# -----------------테스트용 실행 코드-------------
-# template_dir = Path(".")  
-# env = Environment(loader=FileSystemLoader(template_dir))
-
-# template = env.get_template("pqc_template.j2")
-
-# template_vars = {
-#     "class_name": "PQC6QDummy",
-#     "n_qubits": 6,
-#     "layers": ["RXYZCXLayer", "U3CU3Layer"]
-# }
-
-# rendered_code = template.render(template_vars)
-
-# output_path = Path("./pqc_dummy_6q.py")
-# output_path.write_text(rendered_code, encoding="utf-8")
-
-# print(f"Dummy PQC 코드가 생성되었습니다: {output_path}")
-
-#------------------실제 부르는 함수---------------------------
 env = Environment(loader=FileSystemLoader("app/templates"))
 
 TEMPLATE_MAP = {
@@ -52,7 +32,7 @@ def get_layer_variant(part: str, variant: int) -> list[str]:
 def extract_metadata(part: str, layers: list[str], n_qubits: int) -> dict:
     if part == "encoder":
         return {
-            "encoding_type": "angle-encoding",  # 현재 템플릿 기준으로 고정 가능
+            "encoding_type": "angle-encoding",  
             "input_dim": n_qubits,
             "output_qubits": n_qubits
         }
@@ -83,7 +63,7 @@ def generate_dummy_code(part: str,class_name: str, n_qubits: int, layers: list[s
     code = tpl.render(
         class_name=class_name,
         n_qubits=n_qubits,
-        layers=layers or [],  # MEA 일 때 빈거 요청
+        layers=layers or [],  
         num_classes=9
     )
     out_file = save_path / f"{class_name}.py"

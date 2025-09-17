@@ -25,49 +25,8 @@ app.include_router(test_weights_router)
 app.include_router(upload_router)
 app.include_router(download_router)
 
-#실행 코드
-#uvicorn app.main:app --host 0.0.0.0 --port 8000
+# run backend server
+# uvicorn app.main:app --host 0.0.0.0 --port 8000
 
-#접속주소(내부 임시)
-#http://127.0.0.1:8000/docs
-
-#.\squad\Scripts\activate
-
-'''
-실시간 로그 테스트
-웹 콘솔에서 다음 입력
-
-let ws = new WebSocket("ws://localhost:8000/ws/train-logs");
-
-ws.onmessage = function(event) {
-  console.log("print acc log real time", event.data);
-};
-
-'''
-
-'''
-API코드 생성 요청
-
-{
-  "part": "encoder",
-  "class_name": "StateEncoder6QDummy",
-  "n_qubits": 6,
-  "layers": []
-}
-
-
-{
-  "part": "pqc",
-  "class_name": "PQC6QDummy",
-  "n_qubits": 6,
-  "layers": ["RXYZCXLayer0"]
-}
-
-{
-  "part": "mea",
-  "class_name": "MEA6QDummy",
-  "n_qubits": 6,
-  "layers": []
-}
-
-'''
+# swagger library local address
+# http://127.0.0.1:8000/docs
