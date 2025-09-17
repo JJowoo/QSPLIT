@@ -65,9 +65,8 @@ The *Results* section displays the classification accuracy for each combination 
 ### 2) Setup
 ```bash
 # create & activate venv (example)
-python -m venv .venv
-pip install -r requirements.txt
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
+conda env create -f environment.yml
+conda activate QSPLIT
 ```
 ```bash
 # run backend
