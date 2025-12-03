@@ -73,6 +73,7 @@ conda env create -f environment.yml
 conda activate QSPLIT
 ```
 **Step 2. Dataset Setup**
+
 Before running the backend, you must download and place the dataset.
 - Download Link: [Google Drive Link](https://drive.google.com/file/d/15N7R2SZJHxJIPPBmwAB-JeUCUhvHmNR-/view?usp=sharing)
 - Path: Place the downloaded images into the following directory: Backend/dataset/medmnist/AbdomenCT
