@@ -1,9 +1,8 @@
 # **QSPLIT: Quantum Split Learning Testing Toolkit**
 
-
-
 ## **Tool Components**
-![](https://cdn.discordapp.com/attachments/1149758290566324276/1414482634821599313/Fig3_8.png?ex=68bfbb1b&is=68be699b&hm=2c6dc7ef4dff312d8dcb6bc1fae3581a069c0337c882483f94cd3059c2899711&)
+<img width="1220" height="762" alt="스크린샷 2025-12-03 185520" src="https://github.com/user-attachments/assets/0bbca86b-b062-4290-a472-d12387a05518" />
+
 
 ### **A. Part Selection**
 The *Part Selection* section allows users to choose which components of a QNN architecture (**SE, PQC, MEA**) will be provided as **Target Code** and which will be automatically generated as **Dummy Code**.  
@@ -54,7 +53,11 @@ The *Results* section displays the classification accuracy for each combination 
 
 ## 1. How to Start
 
-### 1) System Prerequisites
+### 1) Web Inference (Quick Start)
+You can access the QSPLIT web interface directly without local installation.
+- Web inference: [Link](https://eb355abb2a59.ngrok-free.app/)
+
+### 2) Local System Prerequisites
 - **Python** ≥ 3.12  
 - **Uvicorn**  
 - **PyTorch** (tested with 2.8.0)  
@@ -62,12 +65,19 @@ The *Results* section displays the classification accuracy for each combination 
 - **Flutter** 3.32.8 (for frontend)  
 - A modern web browser (Chrome/Edge/Firefox)  
 
-### 2) Setup
+### 3) Local Setup
+**Step 1. Environment Setup**
 ```bash
-# create & activate venv (example)
+# create & activate venv
 conda env create -f environment.yml
 conda activate QSPLIT
 ```
+**Step 2. Dataset Setup**
+Before running the backend, you must download and place the dataset.
+- Download Link: [Google Drive Link](https://drive.google.com/file/d/15N7R2SZJHxJIPPBmwAB-JeUCUhvHmNR-/view?usp=sharing)
+- Path: Place the downloaded images into the following directory: Backend/dataset/medmnist/AbdomenCT
+
+**Step 3. Run Application**
 ```bash
 # run backend
 cd Backend
