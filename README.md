@@ -56,9 +56,9 @@ The *Results* section displays the classification accuracy for each combination 
 
 ### 1) Web Inference (Quick Start)
 You can access the QSPLIT web interface directly without local installation.
-- **URL**: https://eb355abb2a59.ngrok-free.app
+- Web inference: [Link](https://eb355abb2a59.ngrok-free.app/)
 
-### 2) System Prerequisites
+### 2) Local System Prerequisites
 - **Python** ≥ 3.12  
 - **Uvicorn**  
 - **PyTorch** (tested with 2.8.0)  
@@ -66,12 +66,18 @@ You can access the QSPLIT web interface directly without local installation.
 - **Flutter** 3.32.8 (for frontend)  
 - A modern web browser (Chrome/Edge/Firefox)  
 
-### 3) Setup
+### 3) Local Setup
+**Step 1. Environment Setup**
 ```bash
-# create & activate venv (example)
+# create & activate venv
 conda env create -f environment.yml
 conda activate QSPLIT
 ```
+**Step 2. Dataset Setup**
+Before running the backend, you must download and place the dataset.
+- Download Link: [Google Drive Link](https://drive.google.com/file/d/15N7R2SZJHxJIPPBmwAB-JeUCUhvHmNR-/view?usp=sharing)
+- Path: Place the downloaded images into the following directory: Backend/dataset/medmnist/AbdomenCT
+
 ```bash
 # run backend
 cd Backend
