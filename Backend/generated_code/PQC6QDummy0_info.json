@@ -1,8 +1,0 @@
-{
-  "layer_list": [
-    "RY",
-    "RZ",
-    "CNOT"
-  ],
-  "entanglement_type": "CNOT"
-}
