@@ -1,13 +1,15 @@
-from torchvision import datasets, transforms
-from PIL import Image
-import os
+import torch
+import torch.nn as nn
+import torchquantum as tq
 
-def save_cifar_images(path="./shared-data/cifar-10", num_images=10):
-    os.makedirs(path, exist_ok=True)
-    transform = transforms.ToPILImage()
-    dataset = datasets.CIFAR10(root="./client-side/data", train=False, download=True)
-    
-    for i in range(min(num_images, len(dataset))):
-        img, _ = dataset[i]
-        img = transform(img)
-        img.save(os.path.join(path, f"{i:04d}.png"))
+class StateEncoder6QDummy(nn.Module):
+    def __init__(self, n_qubits=6):
+        super().__init__()
+        self.qdevice = tq.QuantumDevice(n_wires=n_qubits)
+
+    def forward(self, x: torch.Tensor):
+        self.qdevice.reset_states(bsz=x.shape[0])
+        for b in range(x.shape[0]):
+            for i in range(4):
+                tq.functional.rx(self.qdevice, wires=i, params=x[b][i])
+        return self.qdevice.get_states_1d()
