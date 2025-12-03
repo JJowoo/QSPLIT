@@ -1,9 +1,8 @@
 # **QSPLIT: Quantum Split Learning Testing Toolkit**
 
-
-
 ## **Tool Components**
-![](https://cdn.discordapp.com/attachments/1149758290566324276/1414482634821599313/Fig3_8.png?ex=68bfbb1b&is=68be699b&hm=2c6dc7ef4dff312d8dcb6bc1fae3581a069c0337c882483f94cd3059c2899711&)
+<img width="1220" height="762" alt="스크린샷 2025-12-03 185520" src="https://github.com/user-attachments/assets/0bbca86b-b062-4290-a472-d12387a05518" />
+
 
 ### **A. Part Selection**
 The *Part Selection* section allows users to choose which components of a QNN architecture (**SE, PQC, MEA**) will be provided as **Target Code** and which will be automatically generated as **Dummy Code**.  
