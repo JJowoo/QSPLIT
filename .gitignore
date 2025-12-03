@@ -1,4 +1,8 @@
 Backend/.DS_Store
 Backend/app/.DS_Store
+Backend/app/trained_weights/**
 **/__pycache__/
 *.pyc
+/Backend/generated_code
+/Frontend/linux
+/Frontend/macos
