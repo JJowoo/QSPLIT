@@ -54,7 +54,11 @@ The *Results* section displays the classification accuracy for each combination 
 
 ## 1. How to Start
 
-### 1) System Prerequisites
+### 1) Web Inference (Quick Start)
+You can access the QSPLIT web interface directly without local installation.
+- **URL**: https://eb355abb2a59.ngrok-free.app
+
+### 2) System Prerequisites
 - **Python** ≥ 3.12  
 - **Uvicorn**  
 - **PyTorch** (tested with 2.8.0)  
@@ -62,7 +66,7 @@ The *Results* section displays the classification accuracy for each combination 
 - **Flutter** 3.32.8 (for frontend)  
 - A modern web browser (Chrome/Edge/Firefox)  
 
-### 2) Setup
+### 3) Setup
 ```bash
 # create & activate venv (example)
 conda env create -f environment.yml
