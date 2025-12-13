@@ -69,8 +69,8 @@ You can access the QSPLIT web interface directly without local installation.
 **Step 1. Environment Setup**
 ```bash
 # create & activate venv
-conda env create -f environment.yml
-conda activate QSPLIT
+pip install --upgrade pip
+pip install -r requirements.txt
 ```
 **Step 2. Dataset Setup**
 
