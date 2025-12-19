@@ -5,8 +5,9 @@ import torchquantum as tq
 class {{ class_name }}(nn.Module):
     def __init__(self, n_qubits={{ n_qubits }}):
         super().__init__()
-        self.qdevice = tq.QuantumDevice(n_wires=n_qubits)
+        self.n_qubits = n_qubits
         self.pqc = tq.QuantumModuleList([
+            {% for _ in range(depth) %}
             {% for layer in layers %}
             {% if layer in ["RY", "RX", "RZ", "Rot", "U3", "CU3"] %}
                 {% for i in range(n_qubits) %}
@@ -22,10 +23,16 @@ class {{ class_name }}(nn.Module):
                 {% endfor %}
             {% endif %}
             {% endfor %}
+            {% endfor %} 
         ])
 
-    def forward(self, x=None):
-        self.qdevice.reset_states(bsz=1)
+    def forward(self, x: torch.Tensor):
+        bsz = x.shape[0]
+        qdev = tq.QuantumDevice(n_wires=self.n_qubits, bsz=bsz, device=x.device)  
+        qdev.reset_states(bsz=bsz)
+        qdev.set_states(x)  
+
         for op in self.pqc:
-            op(self.qdevice)
-        return self.qdevice.get_states_1d()
+            op(qdev)
+
+        return qdev.get_states_1d()

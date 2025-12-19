@@ -16,9 +16,11 @@ class GenerateRequest(BaseModel):
 def generate_code(
     target_parts: list[str] = Query(default=["encoder"]),
     n_qubits: int = 6,
-    variant_count: int = 5
+    variant_count: int = 5,
+    depth: int = 2
 ):
-    base_dir = Path("generated_code")
+    base_dir = Path("generated_code").resolve()
+    base_dir.mkdir(parents=True, exist_ok=True)
     all_parts = {"encoder", "pqc", "mea"}
     selected_parts = set(target_parts)
     dummy_parts = all_parts - selected_parts
@@ -30,7 +32,8 @@ def generate_code(
             base_class_name=f"{part.upper()}{n_qubits}QDummy",
             n_qubits=n_qubits,
             count=variant_count,
-            save_path=base_dir
+            save_path=base_dir,
+            depth=depth
         )
 
     results = []

@@ -1,7 +1,27 @@
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, TemplateNotFound
 from pathlib import Path
 import json
 
+# -----------------테스트용 실행 코드-------------
+# template_dir = Path(".")  
+# env = Environment(loader=FileSystemLoader(template_dir))
+
+# template = env.get_template("pqc_template.j2")
+
+# template_vars = {
+#     "class_name": "PQC6QDummy",
+#     "n_qubits": 6,
+#     "layers": ["RXYZCXLayer", "U3CU3Layer"]
+# }
+
+# rendered_code = template.render(template_vars)
+
+# output_path = Path("./pqc_dummy_6q.py")
+# output_path.write_text(rendered_code, encoding="utf-8")
+
+# print(f"Dummy PQC 코드가 생성되었습니다: {output_path}")
+
+#------------------실제 부르는 함수---------------------------
 env = Environment(loader=FileSystemLoader("app/templates"))
 
 TEMPLATE_MAP = {
@@ -32,7 +52,7 @@ def get_layer_variant(part: str, variant: int) -> list[str]:
 def extract_metadata(part: str, layers: list[str], n_qubits: int) -> dict:
     if part == "encoder":
         return {
-            "encoding_type": "angle-encoding",  
+            "encoding_type": "angle-encoding",  # 현재 템플릿 기준으로 고정 가능
             "input_dim": n_qubits,
             "output_qubits": n_qubits
         }
@@ -51,9 +71,12 @@ def extract_metadata(part: str, layers: list[str], n_qubits: int) -> dict:
 
 
 
-def generate_dummy_code(part: str,class_name: str, n_qubits: int, layers: list[str], save_path: Path= Path("generated_code")) -> Path:
+def generate_dummy_code(part: str,class_name: str, n_qubits: int, layers: list[str], save_path: Path= Path("generated_code"), depth: int = 2) -> Path:
     if part not in TEMPLATE_MAP:
         raise ValueError(f"Unsupported part type: {part}")
+    
+    save_path = Path(save_path).resolve()
+    save_path.mkdir(parents=True, exist_ok=True)
     
     try:
         tpl = env.get_template(TEMPLATE_MAP[part])
@@ -63,20 +86,22 @@ def generate_dummy_code(part: str,class_name: str, n_qubits: int, layers: list[s
     code = tpl.render(
         class_name=class_name,
         n_qubits=n_qubits,
-        layers=layers or [],  
-        num_classes=9
+        layers=layers or [],  # MEA 일 때 빈거 요청
+        num_classes=9,
+        depth=depth, 
     )
     out_file = save_path / f"{class_name}.py"
     out_file.write_text(code, encoding="utf-8")
 
     metadata = extract_metadata(part, layers, n_qubits)
+    metadata["depth"] = depth 
     meta_file = save_path / f"{class_name}_info.json"
     with open(meta_file, "w", encoding="utf-8") as f:
         json.dump(metadata, f, ensure_ascii=False, indent=2)
     
     return out_file
 
-def generate_dummy_variants(part: str, base_class_name: str, n_qubits: int, count: int, save_path: Path = Path("generated_code")) -> list[Path]:
+def generate_dummy_variants(part: str, base_class_name: str, n_qubits: int, count: int, save_path: Path = Path("generated_code"), depth: int = 2) -> list[Path]:
     variant_paths = []
     for i in range(count):
         layers = get_layer_variant(part, i)
@@ -86,7 +111,8 @@ def generate_dummy_variants(part: str, base_class_name: str, n_qubits: int, coun
             class_name=class_name,
             n_qubits=n_qubits,
             layers=layers,
-            save_path=save_path
+            save_path=save_path,
+            depth=depth
         )
         variant_paths.append(path)
     return variant_paths
