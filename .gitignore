@@ -5,3 +5,6 @@ Backend/app/trained_weights/**
 *.pyc
 /Frontend/linux
 /Frontend/macos
+Backend/generated_code/_pycache_
+Backend/generated_code/*.py
+Backend/generated_code/*.json
