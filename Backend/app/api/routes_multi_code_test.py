@@ -8,14 +8,11 @@ from app.services.log_broadcaster import log_broadcaster  # 공용 broadcaster
 import json
 
 import multiprocessing as mp
-from concurrent.futures import ProcessPoolExecutor, as_completed, wait, FIRST_COMPLETED
+from concurrent.futures import ProcessPoolExecutor, as_completed
 import traceback
 
 import time, uuid
 from datetime import datetime
-
-import queue  
-import multiprocessing as mp
 
 # def log_to_websockets(message: dict):
 #     try:
@@ -37,13 +34,6 @@ def _worker_run_single_dummy(job: Dict[str, Any]) -> Dict[str, Any]:
     - log_callback은 워커에서 직접 웹소켓 전송하지 않음(IPC 없으면 불안정).
     - 예외는 status + error dict로 포장해서 반환.
     """
-    mp_log_q = job.get("mp_log_q", None)
-
-    def cb(msg: dict):
-        # msg는 {"message": "..."} 형태로 보내는 게 가장 안전
-        if mp_log_q is not None:
-            mp_log_q.put(msg)
-
     try:
         result = run_qnn_inference(
             code_dir=job["code_dir"],
@@ -53,7 +43,7 @@ def _worker_run_single_dummy(job: Dict[str, Any]) -> Dict[str, Any]:
             target_parts=job["target_parts"],
             save_weights=True,
             save_dir=job["save_dir"],
-            log_callback=cb,                  # 병렬에서는 부모에서만 log_to_queue
+            log_callback=None,                  # 병렬에서는 부모에서만 log_to_queue
             train_epochs=job["train_epochs"],
             dummy_id=job["dummy_id"],
         )
@@ -116,6 +106,7 @@ def run_multi_test(
     sample_count: int = 10,
     train_epochs: int = 5,
     max_concurrent: int = 3,   # 추가: 동시에 돌릴 더미 수
+    depth: int = 2,            # PQC 레이어 깊이
 ):
     base_dir = Path("generated_code").resolve()
     results: List[Dict[str, Any]] = []
@@ -123,9 +114,6 @@ def run_multi_test(
     all_parts = {"encoder", "pqc", "mea"}
     selected_parts = set(target_parts)
     dummy_parts = all_parts - selected_parts
-
-    mgr = mp.Manager()
-    mp_log_q = mgr.Queue()
 
     # 1) 더미 생성(여기는 그대로 순차)
     dummy_sets = {}
@@ -135,7 +123,8 @@ def run_multi_test(
             base_class_name=f"{part.upper()}{n_qubits}QDummy",
             n_qubits=n_qubits,
             count=variant_count,
-            save_path=base_dir
+            save_path=base_dir,
+            depth=depth
         )
 
     # 2) 사용자 파일 매핑
@@ -180,7 +169,6 @@ def run_multi_test(
             "target_parts": target_parts,
             "save_dir": "./trained_weights",
             "train_epochs": train_epochs,
-            "mp_log_q": mp_log_q,
         })
 
     # 4) 병렬 실행
@@ -191,42 +179,24 @@ def run_multi_test(
 
     with ProcessPoolExecutor(max_workers=max_workers, mp_context=ctx) as ex:
         fut_map = {ex.submit(_worker_run_single_dummy, job): job["dummy_id"] for job in jobs}
-        pending = set(fut_map.keys())
 
-        while pending:
-            done, pending = wait(pending, timeout=0.2, return_when=FIRST_COMPLETED)
+        for fut in as_completed(fut_map):
+            dummy_id = fut_map[fut]
+            out = fut.result()
 
-            # (A) 중간 로그 drain
-            while True:
-                try:
-                    msg = mp_log_q.get(False)   # ✅ get_nowait() 대신
-                    log_to_queue(msg)
-                except queue.Empty:
-                    break
+            # 워커가 만든 메시지를 부모가 websocket으로 전송
+            if "log_message" in out:
+                log_to_queue({"message": out["log_message"]})
+            else:
+                # 완료 로그(원하면 형식 변경 가능)
+                if out.get("status") == "ok":
+                    log_to_queue({
+                        "message": f"[Dummy {dummy_id}] Done. Acc={out.get('accuracy',0.0):.3f}, train={out.get('train_seconds',0.0):.2f}s"
+                    })
 
-            # (B) 완료된 future 처리
-            for fut in done:
-                dummy_id = fut_map[fut]
-                out = fut.result()
-
-                if "log_message" in out:
-                    log_to_queue({"message": out["log_message"]})
-                else:
-                    if out.get("status") == "ok":
-                        log_to_queue({
-                            "message": f"[Dummy {dummy_id}] Done. Acc={out.get('accuracy',0.0):.3f}, train={out.get('train_seconds',0.0):.2f}s"
-                        })
-
-                out["info"] = dummy_info_map.get(dummy_id, {})
-                results.append(out)
-
-    # 종료 직전 잔여 로그 drain (권장)
-    while True:
-        try:
-            msg = mp_log_q.get(False)
-            log_to_queue(msg)
-        except queue.Empty:
-            break
+            # info 결합 후 결과 저장
+            out["info"] = dummy_info_map.get(dummy_id, {})
+            results.append(out)
 
     # 5) 응답은 dummy_id 순으로 정렬해서 프론트가 보기 좋게
     results.sort(key=lambda x: x["dummy_id"])
