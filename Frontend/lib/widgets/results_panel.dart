@@ -32,16 +32,19 @@ class ResultsPanel extends StatelessWidget {
                   columns: const [
                     DataColumn(label: Text('Dummy Code')),
                     DataColumn(label: Text('Accuracy')),
+                    DataColumn(label: Text('Train Time')),
                   ],
                   rows: dummyData.asMap().entries.map((entry) {
                     final idx = entry.key;
                     final dummy = entry.value;
                     final dummyId = dummy['dummy_id'] as String;
                     final accuracy = dummy['accuracy'] as double? ?? 0.0;
+                    final trainSeconds = dummy['train_seconds'] as double? ?? 0.0;
                     return DataRow(
                       cells: [
                         DataCell(Text('Dummy#${idx + 1}')),
                         DataCell(Text(accuracy.toStringAsFixed(3))),
+                        DataCell(Text('${trainSeconds.toStringAsFixed(2)}s')),
                       ],
                     );
                   }).toList(),

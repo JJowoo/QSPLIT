@@ -2,9 +2,7 @@ import torch
 import importlib.util
 from pathlib import Path
 from torchvision import transforms
-from torch.utils.data import DataLoader,Subset
-
-
+from torch.utils.data import DataLoader
 from medmnist import INFO
 import medmnist
 import torch.nn as nn
@@ -411,9 +409,6 @@ def run_qnn_inference(
         criterion = nn.CrossEntropyLoss()
         train_loader, num_classes, train_size = load_medmnist_loader(split="train", batch_size=100, shuffle=True)
 
-        
-
-
         images0, labels0 = next(iter(train_loader))
         inputs0 = images0.view(images0.size(0), -1).to(device, non_blocking=True)
         labels0 = labels0.view(-1).long().to(device)
@@ -466,8 +461,9 @@ def run_qnn_inference(
                     acc_step = correct / total if total else 0.0
                     print(f"[Dummy {dummy_id}] Epoch {epoch+1} Step {step}: Loss={avg_loss_step:.4f}, Acc={acc_step:.4f}")
 
-            
+                
 
+            
 
             avg_loss = total_loss / total if total else 0.0
             acc_train = correct / total if total else 0.0

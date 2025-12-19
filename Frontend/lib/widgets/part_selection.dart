@@ -133,10 +133,8 @@ class _PartSelectionState extends State<PartSelection> {
               if (_selectedFile != null) ...[
                 const SizedBox(width: 12),
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: Colors.blue.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(6),
@@ -144,18 +142,13 @@ class _PartSelectionState extends State<PartSelection> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(
-                        Icons.file_present,
-                        color: Colors.blue,
-                        size: 14,
-                      ),
+                      const Icon(Icons.file_present,
+                          color: Colors.blue, size: 14),
                       const SizedBox(width: 4),
                       Text(
                         '${_selectedFile!.name} (${(_selectedFile!.size / 1024).toStringAsFixed(1)} KB)',
                         style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
+                            fontSize: 12, fontWeight: FontWeight.w500),
                       ),
                       const SizedBox(width: 4),
                       InkWell(
@@ -165,11 +158,8 @@ class _PartSelectionState extends State<PartSelection> {
                             _uploadMessage = null;
                           });
                         },
-                        child: const Icon(
-                          Icons.close,
-                          size: 14,
-                          color: Colors.grey,
-                        ),
+                        child: const Icon(Icons.close,
+                            size: 14, color: Colors.grey),
                       ),
                     ],
                   ),
@@ -178,14 +168,13 @@ class _PartSelectionState extends State<PartSelection> {
               const Spacer(),
               ElevatedButton.icon(
                 onPressed: _isUploading ? null : _uploadPythonFile,
-                icon:
-                    _isUploading
-                        ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                        : const Icon(Icons.upload_file),
+                icon: _isUploading
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.upload_file),
                 label: Text(_isUploading ? 'Uploading...' : 'Upload'),
               ),
             ],
@@ -200,10 +189,8 @@ class _PartSelectionState extends State<PartSelection> {
               // Target Code
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
                     color: Colors.blueGrey.shade800.withOpacity(0.4),
                     borderRadius: BorderRadius.circular(10),
@@ -211,31 +198,24 @@ class _PartSelectionState extends State<PartSelection> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Target Code:',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
+                      const Text('Target Code:',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
                       const SizedBox(height: 6),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
-                        children:
-                            ['SE', 'PQC', 'MEA'].map((code) {
-                              return Row(
-                                children: [
-                                  Checkbox(
-                                    value: widget.selectedTargetCodes.contains(
-                                      code,
-                                    ),
-                                    onChanged:
-                                        (val) => widget.onTargetCodeChanged(
-                                          code,
-                                          val ?? false,
-                                        ),
-                                  ),
-                                  Text(code),
-                                ],
-                              );
-                            }).toList(),
+                        children: ['SE', 'PQC', 'MEA'].map((code) {
+                          return Row(
+                            children: [
+                              Checkbox(
+                                value:
+                                    widget.selectedTargetCodes.contains(code),
+                                onChanged: (val) => widget.onTargetCodeChanged(
+                                    code, val ?? false),
+                              ),
+                              Text(code),
+                            ],
+                          );
+                        }).toList(),
                       ),
                     ],
                   ),
@@ -245,10 +225,8 @@ class _PartSelectionState extends State<PartSelection> {
 
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
                     color: Colors.blueGrey.shade800.withOpacity(0.4),
                     borderRadius: BorderRadius.circular(10),
@@ -256,38 +234,29 @@ class _PartSelectionState extends State<PartSelection> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Dummy Code (Auto):',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
+                      const Text('Dummy Code (Auto):',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
                       const SizedBox(height: 6),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
-                        children:
-                            ['SE', 'PQC', 'MEA'].map((code) {
-                              final isSelected = widget.selectedDummyCodes
-                                  .contains(code);
-                              return Row(
-                                children: [
-                                  Checkbox(
-                                    value: isSelected,
-                                    onChanged: null, // 비활성화
-                                  ),
-                                  Text(
-                                    code,
-                                    style:
-                                        isSelected
-                                            ? const TextStyle(
-                                              color: Colors.green,
-                                              fontWeight: FontWeight.bold,
-                                            )
-                                            : const TextStyle(
-                                              color: Colors.grey,
-                                            ),
-                                  ),
-                                ],
-                              );
-                            }).toList(),
+                        children: ['SE', 'PQC', 'MEA'].map((code) {
+                          final isSelected =
+                              widget.selectedDummyCodes.contains(code);
+                          return Row(
+                            children: [
+                              Checkbox(
+                                value: isSelected,
+                                onChanged: null, // 비활성화
+                              ),
+                              Text(code,
+                                  style: isSelected
+                                      ? const TextStyle(
+                                          color: Colors.green,
+                                          fontWeight: FontWeight.bold)
+                                      : const TextStyle(color: Colors.grey)),
+                            ],
+                          );
+                        }).toList(),
                       ),
                     ],
                   ),

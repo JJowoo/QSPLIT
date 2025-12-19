@@ -23,9 +23,8 @@ class DummyGeneration extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
     final selectedDummy = dummyData.firstWhere(
-      (e) => e['dummy_id'] == selectedDummyCode,
-      orElse: () => <String, dynamic>{'info': <String, dynamic>{}},
-    );
+        (e) => e['dummy_id'] == selectedDummyCode,
+        orElse: () => <String, dynamic>{'info': <String, dynamic>{}});
     final info = selectedDummy['info'] as Map<String, dynamic>? ?? {};
     final infoKeys = info.keys.map((k) => k.toString().toUpperCase()).toSet();
     final orderedCodes =
@@ -42,9 +41,7 @@ class DummyGeneration extends StatelessWidget {
               children: [
                 Text('Dummy Code Generation', style: textTheme.titleLarge),
                 ElevatedButton(
-                  onPressed: onRunPressed,
-                  child: const Text('Run'),
-                ),
+                    onPressed: onRunPressed, child: const Text('Run')),
               ],
             ),
             const SizedBox(height: 20),
@@ -57,23 +54,18 @@ class DummyGeneration extends StatelessWidget {
                     width: 150,
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: colorScheme.surfaceContainerHighest.withOpacity(
-                        0.3,
-                      ),
+                      color: colorScheme.surfaceContainerHighest
+                          .withOpacity(0.3),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(
-                            left: 8.0,
-                            bottom: 4.0,
-                          ),
-                          child: Text(
-                            "Dummy List",
-                            style: textTheme.titleSmall,
-                          ),
+                          padding:
+                              const EdgeInsets.only(left: 8.0, bottom: 4.0),
+                          child:
+                              Text("Dummy List", style: textTheme.titleSmall),
                         ),
                         Expanded(
                           child: ListView.builder(
@@ -105,96 +97,81 @@ class DummyGeneration extends StatelessWidget {
                   Expanded(
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children:
-                          orderedCodes
-                              .asMap()
-                              .entries
-                              .map((entry) {
-                                final index = entry.key;
-                                final code = entry.value;
-                                final isGood = code == 'PQC' || code == 'SE';
-                                return [
-                                  if (index > 0) const SizedBox(width: 20),
-                                  Expanded(
-                                    child: Row(
-                                      children: [
-                                        // 좌측 이미지
-                                        Expanded(
-                                          flex: 2,
-                                          child: Container(
-                                            margin: const EdgeInsets.only(
-                                              right: 12,
-                                            ),
-                                            child: Image.asset(
-                                              _getImagePath(code),
-                                              fit: BoxFit.contain,
-                                            ),
-                                          ),
+                      children: orderedCodes
+                          .asMap()
+                          .entries
+                          .map((entry) {
+                            final index = entry.key;
+                            final code = entry.value;
+                            final isGood = code == 'PQC' || code == 'SE';
+                            return [
+                              if (index > 0) const SizedBox(width: 20),
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    // 좌측 이미지
+                                    Expanded(
+                                      flex: 2,
+                                      child: Container(
+                                        margin:
+                                            const EdgeInsets.only(right: 12),
+                                        child: Image.asset(
+                                          _getImagePath(code),
+                                          fit: BoxFit.contain,
                                         ),
-                                        Expanded(
-                                          flex: 3,
-                                          child: Container(
-                                            padding: const EdgeInsets.all(12),
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              border: Border.all(
-                                                color:
-                                                    isGood
-                                                        ? Colors.green.shade200
-                                                        : Colors.grey.shade400,
-                                              ),
-                                              color:
-                                                  isGood
-                                                      ? Colors.green.shade50
-                                                          .withOpacity(0.5)
-                                                      : Colors.grey.shade200
-                                                          .withOpacity(0.5),
-                                            ),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  code,
-                                                  style: textTheme.titleMedium
-                                                      ?.copyWith(
-                                                        color:
-                                                            isGood
-                                                                ? Colors
-                                                                    .green
-                                                                    .shade900
-                                                                : Colors
-                                                                    .grey
-                                                                    .shade800,
-                                                      ),
-                                                ),
-                                                const Divider(),
-                                                Expanded(
-                                                  child: SingleChildScrollView(
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children:
-                                                          _buildCodeDetails(
-                                                            context,
-                                                            code,
-                                                          ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                                      ),
                                     ),
-                                  ),
-                                ];
-                              })
-                              .expand((widgets) => widgets)
-                              .toList(),
+                                    Expanded(
+                                      flex: 3,
+                                      child: Container(
+                                        padding: const EdgeInsets.all(12),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          border: Border.all(
+                                            color: isGood
+                                                ? Colors.green.shade200
+                                                : Colors.grey.shade400,
+                                          ),
+                                          color: isGood
+                                              ? Colors.green.shade50
+                                                  .withOpacity(0.5)
+                                              : Colors.grey.shade200
+                                                  .withOpacity(0.5),
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              code,
+                                              style: textTheme.titleMedium
+                                                  ?.copyWith(
+                                                color: isGood
+                                                    ? Colors.green.shade900
+                                                    : Colors.grey.shade800,
+                                              ),
+                                            ),
+                                            const Divider(),
+                                            Expanded(
+                                              child: SingleChildScrollView(
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: _buildCodeDetails(context, code),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ];
+                          })
+                          .expand((widgets) => widgets)
+                          .toList(),
                     ),
                   ),
                 ],
@@ -222,9 +199,8 @@ class DummyGeneration extends StatelessWidget {
   List<Widget> _buildCodeDetails(BuildContext context, String code) {
     final textStyle = Theme.of(context).textTheme.bodySmall;
     final selectedDummy = dummyData.firstWhere(
-      (e) => e['dummy_id'] == selectedDummyCode,
-      orElse: () => <String, dynamic>{'info': <String, dynamic>{}},
-    );
+        (e) => e['dummy_id'] == selectedDummyCode,
+        orElse: () => <String, dynamic>{'info': <String, dynamic>{}});
     final info = selectedDummy['info'] as Map<String, dynamic>? ?? {};
     final partInfo = info[code.toLowerCase()];
     if (partInfo is Map<String, dynamic>) {

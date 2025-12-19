@@ -19,8 +19,7 @@ def generate_code(
     variant_count: int = 5,
     depth: int = 2
 ):
-    base_dir = Path("generated_code").resolve()
-    base_dir.mkdir(parents=True, exist_ok=True)
+    base_dir = Path("generated_code")
     all_parts = {"encoder", "pqc", "mea"}
     selected_parts = set(target_parts)
     dummy_parts = all_parts - selected_parts

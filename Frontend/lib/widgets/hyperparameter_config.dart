@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class HyperparameterConfig extends StatelessWidget {
   final TextEditingController nQubitsController;
   final TextEditingController batchSizeController;
-  final TextEditingController deviceController;
+  final TextEditingController depthController;
   final TextEditingController epochsController;
   final TextEditingController optimizerController;
   final TextEditingController lrController;
@@ -15,7 +15,7 @@ class HyperparameterConfig extends StatelessWidget {
     super.key,
     required this.nQubitsController,
     required this.batchSizeController,
-    required this.deviceController,
+    required this.depthController,
     required this.epochsController,
     required this.optimizerController,
     required this.lrController,
@@ -160,7 +160,7 @@ class HyperparameterConfig extends StatelessWidget {
       children: [
         _buildTextField('n_qubits', nQubitsController),
         _buildTextField('batch_size', batchSizeController),
-        _buildTextField('to_device', deviceController),
+        _buildTextField('depth', depthController),
       ],
     );
   }

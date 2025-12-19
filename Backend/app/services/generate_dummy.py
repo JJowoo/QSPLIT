@@ -75,9 +75,6 @@ def generate_dummy_code(part: str,class_name: str, n_qubits: int, layers: list[s
     if part not in TEMPLATE_MAP:
         raise ValueError(f"Unsupported part type: {part}")
     
-    save_path = Path(save_path).resolve()
-    save_path.mkdir(parents=True, exist_ok=True)
-    
     try:
         tpl = env.get_template(TEMPLATE_MAP[part])
     except TemplateNotFound as e:

@@ -47,26 +47,21 @@ class _QuantumHomePageState extends State<QuantumHomePage> {
 
   void connectLogWebSocket() {
     _logChannel?.sink.close(); // 기존 연결 종료
-    _logChannel = WebSocketChannel.connect(
-      Uri.parse('wss://localhost:8000/ws/logs'),
-    );
-    _logChannel!.stream.listen(
-      (message) {
-        setState(() {
-          log.add('WS: $message');
-        });
-      },
-      onDone: () {
-        setState(() {
-          log.add('>: WebSocket closed');
-        });
-      },
-      onError: (error) {
-        setState(() {
-          log.add('>: WebSocket error: $error');
-        });
-      },
-    );
+    _logChannel =
+        WebSocketChannel.connect(Uri.parse('ws://localhost:8000/ws/logs'));
+    _logChannel!.stream.listen((message) {
+      setState(() {
+        log.add('WS: $message');
+      });
+    }, onDone: () {
+      setState(() {
+        log.add('>: WebSocket closed');
+      });
+    }, onError: (error) {
+      setState(() {
+        log.add('>: WebSocket error: $error');
+      });
+    });
   }
 
   Future<void> generateDummies() async {
@@ -77,7 +72,7 @@ class _QuantumHomePageState extends State<QuantumHomePage> {
 
     // 기본 파라미터들
     String url =
-        'https://localhost:8000/generate-code?n_qubits=${nQubitsController.text}&variant_count=${numberOfDummies.toString()}&depth=${depthController.text}';
+        'http://localhost:8000/generate-code?n_qubits=${nQubitsController.text}&variant_count=${numberOfDummies.toString()}&depth=${depthController.text}';
 
     // 각 선택된 Target Code를 개별 파라미터로 추가
     for (final code in selectedTargetCodes) {
@@ -94,15 +89,11 @@ class _QuantumHomePageState extends State<QuantumHomePage> {
     });
 
     final queryParams = {
-      'target_parts': selectedTargetCodes
-          .map((code) => code.toLowerCase())
-          .join(','),
+      'target_parts': selectedTargetCodes.map((code) => code.toLowerCase()).join(','),
       'n_qubits': nQubitsController.text,
       'variant_counts': '3',
       'sample_count': '5',
-      'dummy_codes': selectedDummyCodes
-          .map((code) => code.toLowerCase())
-          .join(','),
+      'dummy_codes': selectedDummyCodes.map((code) => code.toLowerCase()).join(','),
       'layer': selectedLayer,
       'batch_size': batchSizeController.text,
       'depth': depthController.text,
@@ -138,7 +129,7 @@ class _QuantumHomePageState extends State<QuantumHomePage> {
 
     final nQubits = nQubitsController.text;
     final url =
-        'https://localhost:8000/download-dummy/$index?n_qubits=$nQubits&include_info=true&allow_partial=true';
+        'http://localhost:8000/download-dummy/$index?n_qubits=$nQubits&include_info=true&allow_partial=true';
 
     setState(() {
       log.add('>: [Export] Requesting download from: $url');
@@ -204,8 +195,7 @@ if __name__ == "__main__":
 
     try {
       final response = await http.get(
-        Uri.parse('https://localhost:8000/api/file/list-files'),
-        headers: {'ngrok-skip-browser-warning': '69420'},
+        Uri.parse('http://localhost:8000/api/file/list-files'),
       );
 
       if (response.statusCode == 200) {
@@ -221,12 +211,10 @@ if __name__ == "__main__":
               final filename = file['filename'] as String;
               final fileSize = file['file_size'] as int;
               final createdTime = DateTime.fromMillisecondsSinceEpoch(
-                (file['created_time'] as double).round() * 1000,
-              );
+                  (file['created_time'] as double).round() * 1000);
 
               log.add(
-                '>: [List] $filename (${(fileSize / 1024).toStringAsFixed(2)} KB) - ${createdTime.toString().substring(0, 19)}',
-              );
+                  '>: [List] $filename (${(fileSize / 1024).toStringAsFixed(2)} KB) - ${createdTime.toString().substring(0, 19)}');
             }
           } else {
             log.add('>: [List] No uploaded files found.');
@@ -235,8 +223,7 @@ if __name__ == "__main__":
       } else {
         setState(() {
           log.add(
-            '>: [List] Failed to retrieve file list: ${response.statusCode}',
-          );
+              '>: [List] Failed to retrieve file list: ${response.statusCode}');
           log.add('>: [List] Error: ${response.body}');
         });
       }
@@ -254,8 +241,7 @@ if __name__ == "__main__":
 
     try {
       final response = await http.delete(
-        Uri.parse('https://localhost:8000/api/file/delete-file/$filename'),
-        headers: {'ngrok-skip-browser-warning': '69420'},
+        Uri.parse('http://localhost:8000/api/file/delete-file/$filename'),
       );
 
       if (response.statusCode == 200) {
@@ -281,15 +267,11 @@ if __name__ == "__main__":
   }
 
   Future<void> uploadPythonFile(
-    String filename,
-    String content,
-    int size,
-  ) async {
+      String filename, String content, int size) async {
     setState(() {
       log.add('>: [Upload] Starting Python file upload...');
       log.add(
-        '>: Filename: $filename, Size: ${(size / 1024).toStringAsFixed(2)} KB',
-      );
+          '>: Filename: $filename, Size: ${(size / 1024).toStringAsFixed(2)} KB');
     });
 
     if (selectedTargetCodes.isEmpty) {
@@ -305,9 +287,8 @@ if __name__ == "__main__":
       // multipart/form-data 요청 생성
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('https://localhost:8000/upload-code'),
+        Uri.parse('http://localhost:8000/upload-code'),
       );
-      request.headers['ngrok-skip-browser-warning'] = '69420';
 
       // 'part' 필드 추가
       request.fields['part'] = part;
@@ -326,16 +307,14 @@ if __name__ == "__main__":
       request.files.add(multipartFile);
 
       log.add(
-        '>: [Upload] MultipartFile created successfully, sending request...',
-      );
+          '>: [Upload] MultipartFile created successfully, sending request...');
 
       // 요청 전송 및 응답 대기
       var streamedResponse = await request.send();
 
       // Check response status code
       log.add(
-        '>: [Upload] Response status code: ${streamedResponse.statusCode}',
-      );
+          '>: [Upload] Response status code: ${streamedResponse.statusCode}');
 
       // Read response body
       var responseBody = await streamedResponse.stream.bytesToString();
@@ -354,7 +333,8 @@ if __name__ == "__main__":
         });
       } else {
         setState(() {
-          log.add('>: [Upload] Upload failed: ${streamedResponse.statusCode}');
+          log.add(
+              '>: [Upload] Upload failed: ${streamedResponse.statusCode}');
           log.add('>: Error content: $responseBody');
         });
       }
@@ -382,17 +362,14 @@ if __name__ == "__main__":
             queryParametersAll[key] = [value];
           }
         });
-        uri = Uri.https('localhost:8000', path, queryParametersAll);
+        uri = Uri.http('localhost:8000', path, queryParametersAll);
       }
 
       setState(() {
         log.add('>: Sending GET request to: $uri');
       });
 
-      final response = await http.get(
-        uri,
-        headers: {'ngrok-skip-browser-warning': '69420'},
-      );
+      final response = await http.get(uri);
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
@@ -403,20 +380,19 @@ if __name__ == "__main__":
             // results 배열에서 dummy_id별 info 파싱
             final results = responseData['results'] as List<dynamic>?;
             if (results != null) {
-              dummyData =
-                  results.map<Map<String, dynamic>>((e) {
-                    final rawInfo = e['info'] ?? {};
-                    final info = <String, dynamic>{};
-                    rawInfo.forEach((k, v) {
-                      info[k] = v is Map ? Map<String, dynamic>.from(v) : v;
-                    });
-                    return {
-                      'dummy_id': e['dummy_id'].toString(),
-                      'accuracy': e['accuracy'] ?? 0.0,
-                      'train_seconds': e['train_seconds'] ?? 0.0,
-                      'info': info,
-                    };
-                  }).toList();
+              dummyData = results.map<Map<String, dynamic>>((e) {
+                final rawInfo = e['info'] ?? {};
+                final info = <String, dynamic>{};
+                rawInfo.forEach((k, v) {
+                  info[k] = v is Map ? Map<String, dynamic>.from(v) : v;
+                });
+                return {
+                  'dummy_id': e['dummy_id'].toString(),
+                  'accuracy': e['accuracy'] ?? 0.0,
+                  'train_seconds': e['train_seconds'] ?? 0.0,
+                  'info': info,
+                };
+              }).toList();
             } else {
               dummyData = [];
             }
@@ -424,29 +400,28 @@ if __name__ == "__main__":
             // generate-code API의 새로운 응답 구조 처리
             final results = responseData['results'] as List<dynamic>?;
             if (results != null) {
-              dummyData =
-                  results.map<Map<String, dynamic>>((e) {
-                    final dummyParts =
-                        e['dummy_parts'] as Map<String, dynamic>? ?? {};
-                    final info = <String, dynamic>{};
+              dummyData = results.map<Map<String, dynamic>>((e) {
+                final dummyParts =
+                    e['dummy_parts'] as Map<String, dynamic>? ?? {};
+                final info = <String, dynamic>{};
 
-                    // dummy_parts의 각 파트 정보를 info로 변환
-                    dummyParts.forEach((partKey, partValue) {
-                      if (partValue is Map<String, dynamic>) {
-                        final partInfo =
-                            partValue['info'] as Map<String, dynamic>? ?? {};
-                        // encoder를 SE로 변환하여 저장
-                        final key = partKey == 'encoder' ? 'se' : partKey;
-                        info[key] = partInfo;
-                      }
-                    });
+                // dummy_parts의 각 파트 정보를 info로 변환
+                dummyParts.forEach((partKey, partValue) {
+                  if (partValue is Map<String, dynamic>) {
+                    final partInfo =
+                        partValue['info'] as Map<String, dynamic>? ?? {};
+                    // encoder를 SE로 변환하여 저장
+                    final key = partKey == 'encoder' ? 'se' : partKey;
+                    info[key] = partInfo;
+                  }
+                });
 
-                    return {
-                      'dummy_id': e['dummy_id'].toString(),
-                      'accuracy': 0.0, // generate-code는 accuracy 정보가 없으므로 기본값
-                      'info': info,
-                    };
-                  }).toList();
+                return {
+                  'dummy_id': e['dummy_id'].toString(),
+                  'accuracy': 0.0, // generate-code는 accuracy 정보가 없으므로 기본값
+                  'info': info,
+                };
+              }).toList();
             } else {
               dummyData = [];
             }
@@ -488,22 +463,21 @@ if __name__ == "__main__":
                   PartSelection(
                     selectedTargetCodes: selectedTargetCodes,
                     selectedDummyCodes: selectedDummyCodes,
-                    onTargetCodeChanged:
-                        (code, val) => setState(() {
-                          if (val) {
-                            selectedTargetCodes.add(code);
-                          } else {
-                            selectedTargetCodes.remove(code);
-                          }
-                          // Target Code 선택에 따라 Dummy Code 자동 업데이트
-                          selectedDummyCodes.clear();
-                          final allCodes = {'SE', 'PQC', 'MEA'};
-                          for (final code in allCodes) {
-                            if (!selectedTargetCodes.contains(code)) {
-                              selectedDummyCodes.add(code);
-                            }
-                          }
-                        }),
+                    onTargetCodeChanged: (code, val) => setState(() {
+                      if (val) {
+                        selectedTargetCodes.add(code);
+                      } else {
+                        selectedTargetCodes.remove(code);
+                      }
+                      // Target Code 선택에 따라 Dummy Code 자동 업데이트
+                      selectedDummyCodes.clear();
+                      final allCodes = {'SE', 'PQC', 'MEA'};
+                      for (final code in allCodes) {
+                        if (!selectedTargetCodes.contains(code)) {
+                          selectedDummyCodes.add(code);
+                        }
+                      }
+                    }),
                     onDummyCodeChanged: (code, val) {
                       // Dummy Code는 수동 선택 불가능
                     },
@@ -518,8 +492,8 @@ if __name__ == "__main__":
                         flex: 1,
                         child: CodeLayer(
                           selectedLayer: selectedLayer,
-                          onChanged:
-                              (val) => setState(() => selectedLayer = val),
+                          onChanged: (val) =>
+                              setState(() => selectedLayer = val),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -533,8 +507,8 @@ if __name__ == "__main__":
                           optimizerController: optimizerController,
                           lrController: lrController,
                           numberOfDummies: numberOfDummies,
-                          onNumberChanged:
-                              (val) => setState(() => numberOfDummies = val),
+                          onNumberChanged: (val) =>
+                              setState(() => numberOfDummies = val),
                           onGeneratePressed: generateDummies,
                         ),
                       ),
@@ -545,25 +519,21 @@ if __name__ == "__main__":
                   // DummyGeneration을 Expanded로 감싸서 남은 공간을 모두 차지하도록 함
                   Expanded(
                     child: DummyGeneration(
-                      dummyList:
-                          dummyData
-                              .map((e) => e['dummy_id'] as String)
-                              .toList(),
+                      dummyList: dummyData
+                          .map((e) => e['dummy_id'] as String)
+                          .toList(),
                       dummyData: dummyData,
-                      selectedDummyCode:
-                          selectedDummyCode.isNotEmpty &&
-                                  dummyData.any(
-                                    (e) => e['dummy_id'] == selectedDummyCode,
-                                  )
-                              ? selectedDummyCode
-                              : (dummyData.isNotEmpty
-                                  ? dummyData.first['dummy_id'] as String
-                                  : ''),
+                      selectedDummyCode: selectedDummyCode.isNotEmpty &&
+                              dummyData.any(
+                                  (e) => e['dummy_id'] == selectedDummyCode)
+                          ? selectedDummyCode
+                          : (dummyData.isNotEmpty
+                              ? dummyData.first['dummy_id'] as String
+                              : ''),
                       selectedDummyCodes: selectedDummyCodes,
-                      onDummyCodeChanged:
-                          (code) => setState(() {
-                            selectedDummyCode = code;
-                          }),
+                      onDummyCodeChanged: (code) => setState(() {
+                        selectedDummyCode = code;
+                      }),
                       onRunPressed: runTestWithSavedWeights,
                     ),
                   ),
@@ -583,15 +553,12 @@ if __name__ == "__main__":
                   const SizedBox(height: 20),
                   _divider(),
                   Expanded(
-                    child: ResultsPanel(
-                      dummyData: dummyData,
-                      onExport: exportDummyWeights,
-                    ),
-                  ),
+                      child: ResultsPanel(
+                          dummyData: dummyData, onExport: exportDummyWeights)),
                 ],
               ),
             ),
-          ),
+          )
         ],
       ),
     );
