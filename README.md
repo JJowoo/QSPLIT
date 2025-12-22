@@ -1,6 +1,6 @@
 # QSPLIT: Quantum Split Learning Testing Toolkit
 
-**QSPLIT** is a GUI-based framework designed for automated testing and development of Quantum Neural Network (QNN) architectures. By combining user-provided **Target Code** with automatically generated **Dummy Code**, QSPLIT facilitates efficient Split Learning experiments.
+**QSPLIT** is a GUI-based testing framework designed for the efficient validation of quantum split learning architectures by automatically generating dummy code to complete user-provided QNN component subsets. It supports parallel split learning across diverse architectural combinations, allowing developers to monitor real-time logs and identify trainable configurations through an intuitive interface.
 
 [![Demo Video](https://img.shields.io/badge/Demo-Video-red?style=for-the-badge&logo=youtube)](https://github.com/user-attachments/assets/3a013af0-2cd1-43a7-b4a8-30ccf24d3538)
 [![Web Inference](https://img.shields.io/badge/Web-Inference-blue?style=for-the-badge&logo=googlechrome)](https://eb355abb2a59.ngrok-free.app/)
@@ -104,7 +104,7 @@ flutter run -d chrome
 - Enables reuse, extension, and integration into follow-up experiments or deployment
 
 # Supplementary Examples
-##Target Code: MEA, Dummy Code: SE, PQC
+## Target Code: MEA, Dummy Code: SE, PQC
 [https://github.com/user-attachments/assets/24fb7965-2d18-42cd-9492-faf29ad299a7](https://github.com/user-attachments/assets/24fb7965-2d18-42cd-9492-faf29ad299a7)
 
 
