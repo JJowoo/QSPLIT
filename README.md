@@ -134,7 +134,13 @@ flutter run -d chrome
 
 - In *Results*, select a dummy code and click **Export**  
 - Outputs an executable `.py` file compatible with *TorchQuantum*  
-- Enables reuse, extension, and integration into follow-up experiments or deployment  
+- Enables reuse, extension, and integration into follow-up experiments or deployment
+
+---
+# Supplementary Examples
+## Target Code: MEA, Dummy Code: SE, PQC
+https://github.com/user-attachments/assets/24fb7965-2d18-42cd-9492-faf29ad299a7
+
 
 ---
 
