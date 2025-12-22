@@ -10,8 +10,9 @@
 ## 🛠 Tool Components
 
 <p align="center">
-  <img width="1000" alt="QSPLIT Components" src="https://github.com/user-attachments/assets/0bbca86b-b062-4290-a472-d12387a05518" />
+  <img width="1794" height="1068" alt="Group 26" src="https://github.com/user-attachments/assets/16be648f-2017-4cb9-bbbe-31daff43afb9" />
 </p>
+
 
 ### **A. Part Selection**
 Define which components of the QNN (SE, PQC, MEA) are provided by the user and which are generated.
