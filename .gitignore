@@ -8,3 +8,4 @@ Backend/app/trained_weights/**
 Backend/generated_code/_pycache_
 Backend/generated_code/*.py
 Backend/generated_code/*.json
+/Backend/dataset
