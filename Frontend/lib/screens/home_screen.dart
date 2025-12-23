@@ -451,15 +451,209 @@ if __name__ == "__main__":
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Quantum Split Learning UI')),
-      body: Row(
-        children: [
-          Expanded(
-            flex: 3,
-            child: Padding(
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.maxWidth > 1200) {
+            return Row(
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: LayoutBuilder(
+                      builder: (context, columnConstraints) {
+                        if (columnConstraints.maxHeight < 1000) {
+                          return SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                PartSelection(
+                                  selectedTargetCodes: selectedTargetCodes,
+                                  selectedDummyCodes: selectedDummyCodes,
+                                  onTargetCodeChanged: (code, val) => setState(() {
+                                    if (val) {
+                                      selectedTargetCodes.add(code);
+                                    } else {
+                                      selectedTargetCodes.remove(code);
+                                    }
+                                    selectedDummyCodes.clear();
+                                    final allCodes = {'SE', 'PQC', 'MEA'};
+                                    for (final code in allCodes) {
+                                      if (!selectedTargetCodes.contains(code)) {
+                                        selectedDummyCodes.add(code);
+                                      }
+                                    }
+                                  }),
+                                  onDummyCodeChanged: (code, val) {},
+                                  onUploadPythonFile: uploadPythonFile,
+                                ),
+                                const SizedBox(height: 20),
+                                _divider(),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      flex: 1,
+                                      child: CodeLayer(
+                                        selectedLayer: selectedLayer,
+                                        onChanged: (val) =>
+                                            setState(() => selectedLayer = val),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      flex: 2,
+                                      child: HyperparameterConfig(
+                                        nQubitsController: nQubitsController,
+                                        batchSizeController: batchSizeController,
+                                        depthController: depthController,
+                                        epochsController: epochsController,
+                                        optimizerController: optimizerController,
+                                        lrController: lrController,
+                                        numberOfDummies: numberOfDummies,
+                                        onNumberChanged: (val) =>
+                                            setState(() => numberOfDummies = val),
+                                        onGeneratePressed: generateDummies,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 20),
+                                _divider(),
+                                SizedBox(
+                                  height: 600,
+                                  child: DummyGeneration(
+                                    dummyList: dummyData
+                                        .map((e) => e['dummy_id'] as String)
+                                        .toList(),
+                                    dummyData: dummyData,
+                                    selectedDummyCode: selectedDummyCode
+                                                .isNotEmpty &&
+                                            dummyData.any((e) =>
+                                                e['dummy_id'] == selectedDummyCode)
+                                        ? selectedDummyCode
+                                        : (dummyData.isNotEmpty
+                                            ? dummyData.first['dummy_id'] as String
+                                            : ''),
+                                    selectedDummyCodes: selectedDummyCodes,
+                                    onDummyCodeChanged: (code) => setState(() {
+                                      selectedDummyCode = code;
+                                    }),
+                                    onRunPressed: runTestWithSavedWeights,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        } else {
+                          return Column(
+                            children: [
+                              PartSelection(
+                                selectedTargetCodes: selectedTargetCodes,
+                                selectedDummyCodes: selectedDummyCodes,
+                                onTargetCodeChanged: (code, val) => setState(() {
+                                  if (val) {
+                                    selectedTargetCodes.add(code);
+                                  } else {
+                                    selectedTargetCodes.remove(code);
+                                  }
+                                  selectedDummyCodes.clear();
+                                  final allCodes = {'SE', 'PQC', 'MEA'};
+                                  for (final code in allCodes) {
+                                    if (!selectedTargetCodes.contains(code)) {
+                                      selectedDummyCodes.add(code);
+                                    }
+                                  }
+                                }),
+                                onDummyCodeChanged: (code, val) {},
+                                onUploadPythonFile: uploadPythonFile,
+                              ),
+                              const SizedBox(height: 20),
+                              _divider(),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    flex: 1,
+                                    child: CodeLayer(
+                                      selectedLayer: selectedLayer,
+                                      onChanged: (val) =>
+                                          setState(() => selectedLayer = val),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    flex: 2,
+                                    child: HyperparameterConfig(
+                                      nQubitsController: nQubitsController,
+                                      batchSizeController: batchSizeController,
+                                      depthController: depthController,
+                                      epochsController: epochsController,
+                                      optimizerController: optimizerController,
+                                      lrController: lrController,
+                                      numberOfDummies: numberOfDummies,
+                                      onNumberChanged: (val) =>
+                                          setState(() => numberOfDummies = val),
+                                      onGeneratePressed: generateDummies,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 20),
+                              _divider(),
+                              Expanded(
+                                child: DummyGeneration(
+                                  dummyList: dummyData
+                                      .map((e) => e['dummy_id'] as String)
+                                      .toList(),
+                                  dummyData: dummyData,
+                                  selectedDummyCode: selectedDummyCode
+                                              .isNotEmpty &&
+                                          dummyData.any((e) =>
+                                              e['dummy_id'] == selectedDummyCode)
+                                      ? selectedDummyCode
+                                      : (dummyData.isNotEmpty
+                                          ? dummyData.first['dummy_id'] as String
+                                          : ''),
+                                  selectedDummyCodes: selectedDummyCodes,
+                                  onDummyCodeChanged: (code) => setState(() {
+                                    selectedDummyCode = code;
+                                  }),
+                                  onRunPressed: runTestWithSavedWeights,
+                                ),
+                              ),
+                            ],
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      // mainAxisAlignment: MainAxisAlignment.center,
+                      // crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(child: LogPanel(log: log)),
+                        const SizedBox(height: 20),
+                        _divider(),
+                        Expanded(
+                            child: ResultsPanel(
+                                dummyData: dummyData,
+                                onExport: exportDummyWeights)),
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            );
+          } else {
+            return SingleChildScrollView(
               padding: const EdgeInsets.all(12),
               child: Column(
                 children: [
-                  // 상단 고정 영역
                   PartSelection(
                     selectedTargetCodes: selectedTargetCodes,
                     selectedDummyCodes: selectedDummyCodes,
@@ -469,7 +663,6 @@ if __name__ == "__main__":
                       } else {
                         selectedTargetCodes.remove(code);
                       }
-                      // Target Code 선택에 따라 Dummy Code 자동 업데이트
                       selectedDummyCodes.clear();
                       final allCodes = {'SE', 'PQC', 'MEA'};
                       for (final code in allCodes) {
@@ -478,46 +671,67 @@ if __name__ == "__main__":
                         }
                       }
                     }),
-                    onDummyCodeChanged: (code, val) {
-                      // Dummy Code는 수동 선택 불가능
-                    },
+                    onDummyCodeChanged: (code, val) {},
                     onUploadPythonFile: uploadPythonFile,
                   ),
                   const SizedBox(height: 20),
                   _divider(),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        flex: 1,
-                        child: CodeLayer(
-                          selectedLayer: selectedLayer,
-                          onChanged: (val) =>
-                              setState(() => selectedLayer = val),
+                  constraints.maxWidth > 800
+                      ? Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: CodeLayer(
+                                selectedLayer: selectedLayer,
+                                onChanged: (val) =>
+                                    setState(() => selectedLayer = val),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              flex: 2,
+                              child: HyperparameterConfig(
+                                nQubitsController: nQubitsController,
+                                batchSizeController: batchSizeController,
+                                depthController: depthController,
+                                epochsController: epochsController,
+                                optimizerController: optimizerController,
+                                lrController: lrController,
+                                numberOfDummies: numberOfDummies,
+                                onNumberChanged: (val) =>
+                                    setState(() => numberOfDummies = val),
+                                onGeneratePressed: generateDummies,
+                              ),
+                            ),
+                          ],
+                        )
+                      : Column(
+                          children: [
+                            CodeLayer(
+                              selectedLayer: selectedLayer,
+                              onChanged: (val) =>
+                                  setState(() => selectedLayer = val),
+                            ),
+                            const SizedBox(height: 8),
+                            HyperparameterConfig(
+                              nQubitsController: nQubitsController,
+                              batchSizeController: batchSizeController,
+                              depthController: depthController,
+                              epochsController: epochsController,
+                              optimizerController: optimizerController,
+                              lrController: lrController,
+                              numberOfDummies: numberOfDummies,
+                              onNumberChanged: (val) =>
+                                  setState(() => numberOfDummies = val),
+                              onGeneratePressed: generateDummies,
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        flex: 2,
-                        child: HyperparameterConfig(
-                          nQubitsController: nQubitsController,
-                          batchSizeController: batchSizeController,
-                          depthController: depthController,
-                          epochsController: epochsController,
-                          optimizerController: optimizerController,
-                          lrController: lrController,
-                          numberOfDummies: numberOfDummies,
-                          onNumberChanged: (val) =>
-                              setState(() => numberOfDummies = val),
-                          onGeneratePressed: generateDummies,
-                        ),
-                      ),
-                    ],
-                  ),
                   const SizedBox(height: 20),
                   _divider(),
-                  // DummyGeneration을 Expanded로 감싸서 남은 공간을 모두 차지하도록 함
-                  Expanded(
+                  SizedBox(
+                    height: 800,
                     child: DummyGeneration(
                       dummyList: dummyData
                           .map((e) => e['dummy_id'] as String)
@@ -537,29 +751,24 @@ if __name__ == "__main__":
                       onRunPressed: runTestWithSavedWeights,
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Column(
-                // mainAxisAlignment: MainAxisAlignment.center,
-                // crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(child: LogPanel(log: log)),
                   const SizedBox(height: 20),
                   _divider(),
-                  Expanded(
-                      child: ResultsPanel(
-                          dummyData: dummyData, onExport: exportDummyWeights)),
+                  SizedBox(
+                    height: 300,
+                    child: LogPanel(log: log),
+                  ),
+                  const SizedBox(height: 20),
+                  _divider(),
+                  SizedBox(
+                    height: 300,
+                    child: ResultsPanel(
+                        dummyData: dummyData, onExport: exportDummyWeights),
+                  ),
                 ],
               ),
-            ),
-          )
-        ],
+            );
+          }
+        },
       ),
     );
   }

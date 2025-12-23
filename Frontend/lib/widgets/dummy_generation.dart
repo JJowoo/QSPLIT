@@ -95,21 +95,22 @@ class DummyGeneration extends StatelessWidget {
                   const SizedBox(width: 12),
                   // Visualization + Details
                   Expanded(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: orderedCodes
-                          .asMap()
-                          .entries
-                          .map((entry) {
-                            final index = entry.key;
-                            final code = entry.value;
-                            final isGood = code == 'PQC' || code == 'SE';
-                            return [
-                              if (index > 0) const SizedBox(width: 20),
-                              Expanded(
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final isNarrow = constraints.maxWidth < 600;
+                        if (isNarrow) {
+                          // Vertical layout for narrow space
+                          return ListView.separated(
+                            itemCount: orderedCodes.length,
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 12),
+                            itemBuilder: (context, index) {
+                              final code = orderedCodes[index];
+                              final isGood = code == 'PQC' || code == 'SE';
+                              return Container(
+                                height: 200, // Fixed height for each block
                                 child: Row(
                                   children: [
-                                    // 좌측 이미지
                                     Expanded(
                                       flex: 2,
                                       child: Container(
@@ -156,8 +157,10 @@ class DummyGeneration extends StatelessWidget {
                                             Expanded(
                                               child: SingleChildScrollView(
                                                 child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: _buildCodeDetails(context, code),
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: _buildCodeDetails(
+                                                      context, code),
                                                 ),
                                               ),
                                             ),
@@ -167,11 +170,98 @@ class DummyGeneration extends StatelessWidget {
                                     ),
                                   ],
                                 ),
-                              ),
-                            ];
-                          })
-                          .expand((widgets) => widgets)
-                          .toList(),
+                              );
+                            },
+                          );
+                        } else {
+                          // Horizontal layout for wide space
+                          return Row(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: orderedCodes
+                                .asMap()
+                                .entries
+                                .map((entry) {
+                                  final index = entry.key;
+                                  final code = entry.value;
+                                  final isGood = code == 'PQC' || code == 'SE';
+                                  return [
+                                    if (index > 0) const SizedBox(width: 20),
+                                    Expanded(
+                                      child: Row(
+                                        children: [
+                                          // 좌측 이미지
+                                          Expanded(
+                                            flex: 2,
+                                            child: Container(
+                                              margin: const EdgeInsets.only(
+                                                  right: 12),
+                                              child: Image.asset(
+                                                _getImagePath(code),
+                                                fit: BoxFit.contain,
+                                              ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            flex: 3,
+                                            child: Container(
+                                              padding: const EdgeInsets.all(12),
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                border: Border.all(
+                                                  color: isGood
+                                                      ? Colors.green.shade200
+                                                      : Colors.grey.shade400,
+                                                ),
+                                                color: isGood
+                                                    ? Colors.green.shade50
+                                                        .withOpacity(0.5)
+                                                    : Colors.grey.shade200
+                                                        .withOpacity(0.5),
+                                              ),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    code,
+                                                    style: textTheme.titleMedium
+                                                        ?.copyWith(
+                                                      color: isGood
+                                                          ? Colors.green
+                                                              .shade900
+                                                          : Colors.grey
+                                                              .shade800,
+                                                    ),
+                                                  ),
+                                                  const Divider(),
+                                                  Expanded(
+                                                    child:
+                                                        SingleChildScrollView(
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children:
+                                                            _buildCodeDetails(
+                                                                context, code),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ];
+                                })
+                                .expand((widgets) => widgets)
+                                .toList(),
+                          );
+                        }
+                      },
                     ),
                   ),
                 ],
