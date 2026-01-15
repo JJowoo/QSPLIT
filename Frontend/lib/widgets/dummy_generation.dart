@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 class DummyGeneration extends StatelessWidget {
@@ -40,62 +42,17 @@ class DummyGeneration extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('Dummy Code Generation', style: textTheme.titleLarge),
-                ElevatedButton(
-                    onPressed: onRunPressed, child: const Text('Run')),
+                ElevatedButton(onPressed: onRunPressed, child: const Text('Run')),
               ],
             ),
             const SizedBox(height: 20),
             Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Dummy List
-                  Container(
-                    width: 150,
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: colorScheme.surfaceContainerHighest
-                          .withOpacity(0.3),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding:
-                              const EdgeInsets.only(left: 8.0, bottom: 4.0),
-                          child:
-                              Text("Dummy List", style: textTheme.titleSmall),
-                        ),
-                        Expanded(
-                          child: ListView.builder(
-                            itemCount: dummyList.length,
-                            itemBuilder: (context, idx) {
-                              final dummy = dummyList[idx];
-                              return Row(
-                                children: [
-                                  Radio<String>(
-                                    value: dummy,
-                                    groupValue: selectedDummyCode,
-                                    onChanged: (val) {
-                                      if (val != null) {
-                                        onDummyCodeChanged(val);
-                                      }
-                                    },
-                                  ),
-                                  Expanded(child: Text('Dummy#${idx + 1}')),
-                                ],
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  // Visualization + Details
-                  Expanded(
-                    child: LayoutBuilder(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final isNarrowOuter = constraints.maxWidth < 800;
+
+                  Widget detailsArea() {
+                    return LayoutBuilder(
                       builder: (context, constraints) {
                         final isNarrow = constraints.maxWidth < 600;
                         if (isNarrow) {
@@ -107,15 +64,14 @@ class DummyGeneration extends StatelessWidget {
                             itemBuilder: (context, index) {
                               final code = orderedCodes[index];
                               final isGood = code == 'PQC' || code == 'SE';
-                              return Container(
+                              return SizedBox(
                                 height: 200, // Fixed height for each block
                                 child: Row(
                                   children: [
                                     Expanded(
                                       flex: 2,
                                       child: Container(
-                                        margin:
-                                            const EdgeInsets.only(right: 12),
+                                        margin: const EdgeInsets.only(right: 12),
                                         child: Image.asset(
                                           _getImagePath(code),
                                           fit: BoxFit.contain,
@@ -127,27 +83,22 @@ class DummyGeneration extends StatelessWidget {
                                       child: Container(
                                         padding: const EdgeInsets.all(12),
                                         decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
+                                          borderRadius: BorderRadius.circular(10),
                                           border: Border.all(
                                             color: isGood
                                                 ? Colors.green.shade200
                                                 : Colors.grey.shade400,
                                           ),
                                           color: isGood
-                                              ? Colors.green.shade50
-                                                  .withOpacity(0.5)
-                                              : Colors.grey.shade200
-                                                  .withOpacity(0.5),
+                                              ? Colors.green.shade50.withAlpha(128)
+                                              : Colors.grey.shade200.withAlpha(128),
                                         ),
                                         child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               code,
-                                              style: textTheme.titleMedium
-                                                  ?.copyWith(
+                                              style: textTheme.titleMedium?.copyWith(
                                                 color: isGood
                                                     ? Colors.green.shade900
                                                     : Colors.grey.shade800,
@@ -157,10 +108,9 @@ class DummyGeneration extends StatelessWidget {
                                             Expanded(
                                               child: SingleChildScrollView(
                                                 child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: _buildCodeDetails(
-                                                      context, code),
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children:
+                                                      _buildCodeDetails(context, code),
                                                 ),
                                               ),
                                             ),
@@ -175,96 +125,197 @@ class DummyGeneration extends StatelessWidget {
                           );
                         } else {
                           // Horizontal layout for wide space
-                          return Row(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: orderedCodes
-                                .asMap()
-                                .entries
-                                .map((entry) {
-                                  final index = entry.key;
-                                  final code = entry.value;
-                                  final isGood = code == 'PQC' || code == 'SE';
-                                  return [
-                                    if (index > 0) const SizedBox(width: 20),
-                                    Expanded(
-                                      child: Row(
-                                        children: [
-                                          // 좌측 이미지
-                                          Expanded(
-                                            flex: 2,
-                                            child: Container(
-                                              margin: const EdgeInsets.only(
-                                                  right: 12),
-                                              child: Image.asset(
-                                                _getImagePath(code),
-                                                fit: BoxFit.contain,
-                                              ),
-                                            ),
-                                          ),
-                                          Expanded(
-                                            flex: 3,
-                                            child: Container(
-                                              padding: const EdgeInsets.all(12),
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                border: Border.all(
-                                                  color: isGood
-                                                      ? Colors.green.shade200
-                                                      : Colors.grey.shade400,
+                          return SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: orderedCodes
+                                    .asMap()
+                                    .entries
+                                    .map((entry) {
+                                      final index = entry.key;
+                                      final code = entry.value;
+                                      final isGood = code == 'PQC' || code == 'SE';
+                                      return [
+                                        if (index > 0) const SizedBox(width: 20),
+                                        SizedBox(
+                                          width: math.max(360, constraints.maxWidth / math.max(1, orderedCodes.length)),
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                flex: 2,
+                                                child: Container(
+                                                  margin: const EdgeInsets.only(right: 12),
+                                                  child: Image.asset(
+                                                    _getImagePath(code),
+                                                    fit: BoxFit.contain,
+                                                  ),
                                                 ),
-                                                color: isGood
-                                                    ? Colors.green.shade50
-                                                        .withOpacity(0.5)
-                                                    : Colors.grey.shade200
-                                                        .withOpacity(0.5),
                                               ),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    code,
-                                                    style: textTheme.titleMedium
-                                                        ?.copyWith(
+                                              Expanded(
+                                                flex: 3,
+                                                child: Container(
+                                                  padding: const EdgeInsets.all(12),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(10),
+                                                    border: Border.all(
                                                       color: isGood
-                                                          ? Colors.green
-                                                              .shade900
-                                                          : Colors.grey
-                                                              .shade800,
+                                                          ? Colors.green.shade200
+                                                          : Colors.grey.shade400,
                                                     ),
+                                                    color: isGood
+                                                        ? Colors.green.shade50.withAlpha(128)
+                                                        : Colors.grey.shade200.withAlpha(128),
                                                   ),
-                                                  const Divider(),
-                                                  Expanded(
-                                                    child:
-                                                        SingleChildScrollView(
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children:
-                                                            _buildCodeDetails(
-                                                                context, code),
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        code,
+                                                        style: textTheme.titleMedium?.copyWith(
+                                                          color: isGood
+                                                              ? Colors.green.shade900
+                                                              : Colors.grey.shade800,
+                                                        ),
                                                       ),
-                                                    ),
+                                                      const Divider(),
+                                                      Expanded(
+                                                        child: SingleChildScrollView(
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment.start,
+                                                            children: _buildCodeDetails(
+                                                                context, code),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
-                                                ],
+                                                ),
                                               ),
-                                            ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                    ),
-                                  ];
-                                })
-                                .expand((widgets) => widgets)
-                                .toList(),
+                                        ),
+                                      ];
+                                    })
+                                    .expand((widgets) => widgets)
+                                    .toList(),
+                              ),
+                            ),
                           );
                         }
                       },
-                    ),
-                  ),
-                ],
+                    );
+                  }
+
+                  Widget dummyListVertical() {
+                    return Container(
+                      width: 150,
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color:
+                            colorScheme.surfaceContainerHighest.withAlpha(77),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(left: 8.0, bottom: 4.0),
+                            child: Text("Dummy List", style: textTheme.titleSmall),
+                          ),
+                          Expanded(
+                            child: ListView.builder(
+                              itemCount: dummyList.length,
+                              itemBuilder: (context, idx) {
+                                final dummy = dummyList[idx];
+                                return Row(
+                                  children: [
+                                    Radio<String>(
+                                      value: dummy,
+                                      groupValue: selectedDummyCode,
+                                      onChanged: (val) {
+                                        if (val != null) {
+                                          onDummyCodeChanged(val);
+                                        }
+                                      },
+                                    ),
+                                    Expanded(child: Text('Dummy#${idx + 1}')),
+                                  ],
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  Widget dummyListHorizontal() {
+                    return Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color:
+                            colorScheme.surfaceContainerHighest.withAlpha(77),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(left: 8.0, bottom: 4.0),
+                            child: Text("Dummy List", style: textTheme.titleSmall),
+                          ),
+                          SizedBox(
+                            height: 64,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: dummyList.length,
+                              itemBuilder: (context, idx) {
+                                final dummy = dummyList[idx];
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: 8.0),
+                                  child: ChoiceChip(
+                                    label: Text('Dummy#${idx + 1}'),
+                                    selected: dummy == selectedDummyCode,
+                                    onSelected: (_) => onDummyCodeChanged(dummy),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  if (isNarrowOuter) {
+                    // Narrow window: stack list + details vertically.
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        dummyListHorizontal(),
+                        const SizedBox(height: 12),
+                        Expanded(child: detailsArea()),
+                      ],
+                    );
+                  }
+
+                  // Wide window: two-pane layout.
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      dummyListVertical(),
+                      const SizedBox(width: 12),
+                      Expanded(child: detailsArea()),
+                    ],
+                  );
+                },
               ),
             ),
           ],

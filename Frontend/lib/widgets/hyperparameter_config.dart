@@ -54,20 +54,44 @@ class HyperparameterConfig extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Text(
-                    'Target Code Hyperparameter',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  ElevatedButton(
-                    onPressed: onGeneratePressed,
-                    child: const Text('Generate'),
-                  ),
-                ],
-              ),
+              isNarrow
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Target Code Hyperparameter',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: ElevatedButton(
+                            onPressed: onGeneratePressed,
+                            child: const Text('Generate'),
+                          ),
+                        ),
+                      ],
+                    )
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const Expanded(
+                          child: Text(
+                            'Target Code Hyperparameter',
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        ElevatedButton(
+                          onPressed: onGeneratePressed,
+                          child: const Text('Generate'),
+                        ),
+                      ],
+                    ),
               const SizedBox(height: 12),
               isNarrow
                   ? Column(
@@ -203,11 +227,12 @@ class HyperparameterConfig extends StatelessWidget {
         color: Colors.blueGrey.shade800.withOpacity(0.4),
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('$title: '),
-          const SizedBox(width: 10),
-          child,
+          Text('$title: ', style: const TextStyle(fontWeight: FontWeight.w600)),
+          const SizedBox(height: 8),
+          Align(alignment: Alignment.centerLeft, child: child),
         ],
       ),
     );

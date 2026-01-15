@@ -113,159 +113,220 @@ class _PartSelectionState extends State<PartSelection> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade600),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header with Upload button and File Info
-          Row(
-            children: [
-              const Text(
-                'Part Selection',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              if (_selectedFile != null) ...[
-                const SizedBox(width: 12),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: Colors.blue.withOpacity(0.3)),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isNarrow = constraints.maxWidth < 720;
+
+        Widget fileChip() {
+          if (_selectedFile == null) return const SizedBox.shrink();
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.blue.withAlpha(26),
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: Colors.blue.withAlpha(77)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.file_present, color: Colors.blue, size: 14),
+                const SizedBox(width: 4),
+                Flexible(
+                  child: Text(
+                    '${_selectedFile!.name} (${(_selectedFile!.size / 1024).toStringAsFixed(1)} KB)',
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontSize: 12, fontWeight: FontWeight.w500),
                   ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.file_present,
-                          color: Colors.blue, size: 14),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${_selectedFile!.name} (${(_selectedFile!.size / 1024).toStringAsFixed(1)} KB)',
-                        style: const TextStyle(
-                            fontSize: 12, fontWeight: FontWeight.w500),
-                      ),
-                      const SizedBox(width: 4),
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            _selectedFile = null;
-                            _uploadMessage = null;
-                          });
-                        },
-                        child: const Icon(Icons.close,
-                            size: 14, color: Colors.grey),
-                      ),
-                    ],
+                ),
+                const SizedBox(width: 4),
+                InkWell(
+                  onTap: () {
+                    setState(() {
+                      _selectedFile = null;
+                      _uploadMessage = null;
+                    });
+                  },
+                  child: const Icon(Icons.close, size: 14, color: Colors.grey),
+                ),
+              ],
+            ),
+          );
+        }
+
+        Widget uploadButton() {
+          return ElevatedButton.icon(
+            onPressed: _isUploading ? null : _uploadPythonFile,
+            icon: _isUploading
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.upload_file),
+            label: Text(_isUploading ? 'Uploading...' : 'Upload'),
+          );
+        }
+
+        Widget targetSection() {
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.blueGrey.shade800.withAlpha(102),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Target Code:',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 6),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 4,
+                  children: ['SE', 'PQC', 'MEA'].map((code) {
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Checkbox(
+                          value: widget.selectedTargetCodes.contains(code),
+                          onChanged: (val) =>
+                              widget.onTargetCodeChanged(code, val ?? false),
+                        ),
+                        Text(code),
+                      ],
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+          );
+        }
+
+        Widget dummySection() {
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.blueGrey.shade800.withAlpha(102),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Dummy Code (Auto):',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 6),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 4,
+                  children: ['SE', 'PQC', 'MEA'].map((code) {
+                    final isSelected = widget.selectedDummyCodes.contains(code);
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Checkbox(
+                          value: isSelected,
+                          onChanged: null, // 비활성화
+                        ),
+                        Text(
+                          code,
+                          style: isSelected
+                              ? const TextStyle(
+                                  color: Colors.green,
+                                  fontWeight: FontWeight.bold,
+                                )
+                              : const TextStyle(color: Colors.grey),
+                        ),
+                      ],
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white.withAlpha(13),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.shade600),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              isNarrow
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Part Selection',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                        if (_selectedFile != null) ...[
+                          const SizedBox(height: 8),
+                          fileChip(),
+                        ],
+                        const SizedBox(height: 12),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: uploadButton(),
+                        ),
+                      ],
+                    )
+                  : Row(
+                      children: [
+                        const Text(
+                          'Part Selection',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                        if (_selectedFile != null) ...[
+                          const SizedBox(width: 12),
+                          Expanded(child: fileChip()),
+                        ],
+                        const Spacer(),
+                        uploadButton(),
+                      ],
+                    ),
+
+              if (_uploadMessage != null) ...[
+                const SizedBox(height: 10),
+                Text(
+                  _uploadMessage!,
+                  style: TextStyle(
+                    color: _messageColor,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
-              const Spacer(),
-              ElevatedButton.icon(
-                onPressed: _isUploading ? null : _uploadPythonFile,
-                icon: _isUploading
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Icon(Icons.upload_file),
-                label: Text(_isUploading ? 'Uploading...' : 'Upload'),
-              ),
+
+              const SizedBox(height: 16),
+
+              // Target / Dummy sections
+              isNarrow
+                  ? Column(
+                      children: [
+                        targetSection(),
+                        const SizedBox(height: 12),
+                        dummySection(),
+                      ],
+                    )
+                  : Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(child: targetSection()),
+                        const SizedBox(width: 12),
+                        Expanded(child: dummySection()),
+                      ],
+                    ),
             ],
           ),
-
-          const SizedBox(height: 16),
-
-          // Target and Dummy Code Sections Side by Side
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Target Code
-              Expanded(
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.blueGrey.shade800.withOpacity(0.4),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('Target Code:',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 6),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: ['SE', 'PQC', 'MEA'].map((code) {
-                          return Row(
-                            children: [
-                              Checkbox(
-                                value:
-                                    widget.selectedTargetCodes.contains(code),
-                                onChanged: (val) => widget.onTargetCodeChanged(
-                                    code, val ?? false),
-                              ),
-                              Text(code),
-                            ],
-                          );
-                        }).toList(),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-
-              Expanded(
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.blueGrey.shade800.withOpacity(0.4),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('Dummy Code (Auto):',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 6),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: ['SE', 'PQC', 'MEA'].map((code) {
-                          final isSelected =
-                              widget.selectedDummyCodes.contains(code);
-                          return Row(
-                            children: [
-                              Checkbox(
-                                value: isSelected,
-                                onChanged: null, // 비활성화
-                              ),
-                              Text(code,
-                                  style: isSelected
-                                      ? const TextStyle(
-                                          color: Colors.green,
-                                          fontWeight: FontWeight.bold)
-                                      : const TextStyle(color: Colors.grey)),
-                            ],
-                          );
-                        }).toList(),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
