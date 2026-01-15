@@ -28,6 +28,20 @@ try:
 except RuntimeError:
     pass
 
+LOG_Q = None
+
+def _init_worker(log_q):
+    global LOG_Q
+    LOG_Q = log_q
+
+def _worker_log_callback(payload: dict):
+    # 워커 프로세스에서 호출됨
+    try:
+        if LOG_Q is not None:
+            LOG_Q.put(payload)
+    except Exception:
+        pass
+
 def _worker_run_single_dummy(job: Dict[str, Any]) -> Dict[str, Any]:
     """
     워커 프로세스에서 더미 1개 실행하고 결과를 dict로 반환.
@@ -53,6 +67,7 @@ def _worker_run_single_dummy(job: Dict[str, Any]) -> Dict[str, Any]:
             "status": "ok",
             "accuracy": result.get("accuracy", 0.0),
             "details": result.get("results", []),
+            "history": result.get("history", []),
             "train_seconds": result.get("train_seconds", 0.0),
             "inference_seconds": result.get("inference_seconds", 0.0),
             "total_seconds": result.get("total_seconds", 0.0),

@@ -344,9 +344,9 @@ def run_qnn_inference(
     if log_callback:
         log_callback({"message": "Loading modules..."})
 
-    print(f"Loaded encoder: {file_map.get('encoder')}")
-    print(f"Loaded pqc:     {file_map.get('pqc')}")
-    print(f"Loaded mea:     {file_map.get('mea')}")
+    print(f"Loaded encoder: {encoder_path.resolve()}")
+    print(f"Loaded pqc:     {pqc_path.resolve()}")
+    print(f"Loaded mea:     {mea_path.resolve()}")
 
     encoder_cls = load_class_safe(encoder_path.stem, encoder_path, part="encoder")
     pqc_cls     = load_class_safe(pqc_path.stem,     pqc_path,     part="pqc")
@@ -399,6 +399,7 @@ def run_qnn_inference(
     # (수정) 기본값 초기화: 학습 안 해도 안전
     train_seconds = 0.0
     inference_seconds = 0.0
+    history: List[dict] = []
 
     
     
@@ -468,6 +469,12 @@ def run_qnn_inference(
             avg_loss = total_loss / total if total else 0.0
             acc_train = correct / total if total else 0.0
             print(f"[Dummy {dummy_id}] Epoch {epoch+1}: Loss={avg_loss:.4f}, Acc={acc_train:.4f}")
+
+            history.append({
+                "epoch": int(epoch + 1),
+                "train_loss": float(avg_loss),
+                "train_acc": float(acc_train),
+            })
 
             if log_callback:
                 log_callback({"message": f"[Dummy {dummy_id}] Epoch {epoch+1}: Loss={avg_loss:.4f}, Acc={acc_train:.4f}"})
@@ -542,5 +549,6 @@ def run_qnn_inference(
         "accuracy": acc,
         "samples_evaluated": total,
         "results": results,
-        "train_seconds": float(train_seconds)
+        "train_seconds": float(train_seconds),
+        "history": history
     }

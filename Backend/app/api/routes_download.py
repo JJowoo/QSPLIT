@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from pathlib import Path
 from typing import List
-import io, zipfile, datetime
+import io, zipfile, datetime, re
 
 router = APIRouter()
 BASE_DIR = Path("generated_code")
@@ -24,6 +24,119 @@ def _candidate_paths(n_qubits: int, index: int) -> List[Path]:
 
 def _info_path(py_path: Path) -> Path:
     return py_path.with_name(py_path.stem + "_info.json")
+
+def _list_indices(n_qubits: int) -> List[int]:
+    if not BASE_DIR.exists():
+        return []
+    indices = set()
+    pat = re.compile(rf".*{n_qubits}QDummy(\d+)$")  # stem 끝의 숫자만
+    for p in BASE_DIR.glob(f"*{n_qubits}QDummy*.py"):
+        m = pat.match(p.stem)
+        if m:
+            indices.add(int(m.group(1)))
+    return sorted(indices)
+
+@router.get("/download-dummy-all")
+def download_all_dummy_bundles(
+    n_qubits: int = Query(6),
+    include_info: bool = Query(False),
+    allow_partial: bool = Query(False),
+):
+    if not BASE_DIR.exists():
+        raise HTTPException(status_code=404, detail="generated_code directory not found")
+
+    indices = _list_indices(n_qubits)
+    if not indices:
+        raise HTTPException(status_code=404, detail=f"No dummy files found for n_qubits={n_qubits}")
+
+    # 고정 encoder(인덱스 없음)
+    fixed_encoder = BASE_DIR / f"StateEncoder{n_qubits}QDummy.py"
+
+    buf = io.BytesIO()
+    missing_total = []  # allow_partial=False일 때 에러 메시지용
+
+    with zipfile.ZipFile(buf, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+        # 고정 encoder가 있으면 최상단에 포함
+        if fixed_encoder.exists():
+            zf.write(fixed_encoder, arcname=fixed_encoder.name)
+            if include_info:
+                info = _info_path(fixed_encoder)
+                if info.exists():
+                    zf.write(info, arcname=info.name)
+
+        for idx in indices:
+            # 각 index에 대해 3종 묶기(encoder는 더미형/StateEncoder형 둘 다 시도)
+            encoder_candidates = [
+                BASE_DIR / f"ENCODER{n_qubits}QDummy{idx}.py",
+                BASE_DIR / f"StateEncoder{n_qubits}QDummy{idx}.py",
+            ]
+            encoder_file = next((p for p in encoder_candidates if p.exists()), None)
+
+            pqc_file = BASE_DIR / f"PQC{n_qubits}QDummy{idx}.py"
+            mea_file = BASE_DIR / f"MEA{n_qubits}QDummy{idx}.py"
+
+            missing = []
+            if encoder_file is None and (not fixed_encoder.exists()):
+                # 고정 encoder도 없고, index encoder도 없으면 encoder missing으로 본다
+                missing.append(f"ENCODER/StateEncoder (idx={idx})")
+            if not pqc_file.exists():
+                missing.append(f"PQC (idx={idx})")
+            if not mea_file.exists():
+                missing.append(f"MEA (idx={idx})")
+
+            if missing and not allow_partial:
+                missing_total.extend(missing)
+                continue  # 일단 모았다가 아래에서 한 번에 404
+
+            # ZIP 내부 경로: idx 폴더로 묶어주면 보기 좋음
+            folder = f"dummy_{idx}/"
+
+            if encoder_file and encoder_file.exists():
+                zf.write(encoder_file, arcname=folder + encoder_file.name)
+                if include_info:
+                    info = _info_path(encoder_file)
+                    if info.exists():
+                        zf.write(info, arcname=folder + info.name)
+
+            if pqc_file.exists():
+                zf.write(pqc_file, arcname=folder + pqc_file.name)
+                if include_info:
+                    info = _info_path(pqc_file)
+                    if info.exists():
+                        zf.write(info, arcname=folder + info.name)
+
+            if mea_file.exists():
+                zf.write(mea_file, arcname=folder + mea_file.name)
+                if include_info:
+                    info = _info_path(mea_file)
+                    if info.exists():
+                        zf.write(info, arcname=folder + info.name)
+
+        if missing_total and not allow_partial:
+            raise HTTPException(
+                status_code=404,
+                detail="Missing files: " + ", ".join(missing_total),
+            )
+
+        zf.writestr(
+            "manifest.txt",
+            "\n".join([
+                f"n_qubits={n_qubits}",
+                f"indices={indices}",
+                f"include_info={include_info}",
+                f"allow_partial={allow_partial}",
+                f"generated_at={datetime.datetime.utcnow().isoformat()}Z",
+                f"fixed_encoder_included={fixed_encoder.exists()}",
+            ])
+        )
+
+    buf.seek(0)
+    filename = f"dummy_all_q{n_qubits}.zip"
+    return StreamingResponse(
+        buf,
+        media_type="application/zip",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
 
 @router.get("/download-dummy/{index}")
 def download_dummy_bundle(
