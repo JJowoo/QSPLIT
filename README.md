@@ -50,7 +50,7 @@ Access the live interface without installation: [QSPLIT Web](https://eb355abb2a5
 
 **Step 1: Environment Setup**
 ```bash
-# Clone the repository and install dependencies
+# Clone the repository and install dependencies (Linux/WSL recommended)
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
