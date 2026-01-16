@@ -2,6 +2,7 @@
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from pathlib import Path
 import hashlib
+import shutil
 
 router = APIRouter()
 
@@ -24,8 +25,16 @@ async def upload_code(
     if not file.filename.endswith(".py"):
         raise HTTPException(status_code=400, detail="Only .py files are allowed")
 
-    save_dir = Path("generated_code")
+    base_dir = Path("generated_code")
+    save_dir = base_dir / "upload"
     save_dir.mkdir(parents=True, exist_ok=True)
+
+    # keep only the latest uploaded files
+    for entry in save_dir.iterdir():
+        if entry.is_dir():
+            shutil.rmtree(entry)
+        else:
+            entry.unlink(missing_ok=True)
 
     dest = save_dir / PART_FILENAME[part_key]
 

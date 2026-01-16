@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Query
 from pydantic import BaseModel
 from pathlib import Path
+import shutil
 from app.services.generate_dummy import generate_dummy_variants
 import json
 
@@ -20,6 +21,16 @@ def generate_code(
     depth: int = 2
 ):
     base_dir = Path("generated_code")
+    base_dir.mkdir(parents=True, exist_ok=True)
+
+    # remove previous dummy files but keep uploaded code
+    for entry in base_dir.iterdir():
+        if entry.name == "upload":
+            continue
+        if entry.is_dir():
+            shutil.rmtree(entry)
+        else:
+            entry.unlink(missing_ok=True)
     all_parts = {"encoder", "pqc", "mea"}
     selected_parts = set(target_parts)
     dummy_parts = all_parts - selected_parts

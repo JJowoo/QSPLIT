@@ -124,6 +124,7 @@ def run_multi_test(
     depth: int = 2,            # PQC 레이어 깊이
 ):
     base_dir = Path("generated_code").resolve()
+    upload_dir = base_dir / "upload"
     results: List[Dict[str, Any]] = []
 
     all_parts = {"encoder", "pqc", "mea"}
@@ -149,7 +150,7 @@ def run_multi_test(
             f"StateEncoder{n_qubits}QDummy.py" if part == "encoder"
             else f"{part.upper()}{n_qubits}QDummy.py"
         )
-        user_file_map[part] = base_dir / file_name
+        user_file_map[part] = upload_dir / file_name
 
     # 3) 더미별 info.json 로드 + job 구성
     dummy_info_map: Dict[int, Dict[str, Any]] = {}
