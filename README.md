@@ -3,7 +3,8 @@
 **QSPLIT** is a GUI-based testing framework designed for the efficient validation of quantum split learning architectures by automatically generating dummy code to complete user-provided QNN component subsets. It supports parallel split learning across diverse architectural combinations, allowing developers to monitor real-time logs and identify trainable configurations through an intuitive interface.
 
 [![Demo Video](https://img.shields.io/badge/Demo-Video-red?style=for-the-badge&logo=youtube)](https://github.com/user-attachments/assets/3a013af0-2cd1-43a7-b4a8-30ccf24d3538)
-[![Web Inference](https://img.shields.io/badge/Web-Inference-blue?style=for-the-badge&logo=googlechrome)](https://eb355abb2a59.ngrok-free.app/)
+[![Web Inference](https://img.shields.io/badge/Web-Inference-blue?style=for-the-badge&logo=googlechrome)](https://62ef1eed12f7.ngrok-free.app/)
+
 
 ---
 
