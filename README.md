@@ -49,10 +49,20 @@ Access the live interface without installation: [QSPLIT Web](https://eb355abb2a5
 - **PyTorch** 2.8.0 | **TorchQuantum** 0.1.8
 
 **Step 1: Environment Setup**
+Clone the repository and install dependencies. We recommend using Linux or WSL.
+#### Option A: Using pip (requirements.txt)
+If you prefer a standard Python environment:
 ```bash
-# Clone the repository and install dependencies (Linux/WSL recommended)
 pip install --upgrade pip
 pip install -r requirements.txt
+```
+#### Option B: Using Conda (environment.yml)
+If you prefer Conda, we recommend configuring the libmamba solver for faster dependency resolution:
+```bash
+conda update -n base conda
+conda install -n base conda-libmamba-solver
+conda config --set solver libmamba
+conda env create -f environment.yml
 ```
 
 **Step 2. Dataset Setup**
