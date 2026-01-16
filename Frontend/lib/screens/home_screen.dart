@@ -386,10 +386,18 @@ if __name__ == "__main__":
                 rawInfo.forEach((k, v) {
                   info[k] = v is Map ? Map<String, dynamic>.from(v) : v;
                 });
+
+                final rawHistory = e['history'] as List<dynamic>? ?? const [];
+                final history = rawHistory.map<Map<String, dynamic>>((h) {
+                  if (h is Map) return Map<String, dynamic>.from(h);
+                  return <String, dynamic>{};
+                }).toList();
+
                 return {
                   'dummy_id': e['dummy_id'].toString(),
                   'accuracy': e['accuracy'] ?? 0.0,
                   'train_seconds': e['train_seconds'] ?? 0.0,
+                  'history': history,
                   'info': info,
                 };
               }).toList();
