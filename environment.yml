@@ -7,31 +7,42 @@ channels:
 dependencies:
   - python=3.10
   - pip
-  - pytorch
-  - torchvision
-  - tensorflow
-  - numpy
-  - pandas
-  - scipy
-  - scikit-learn
+  - numpy<2.0
+  - scipy>=1.10
+  - pandas>=2.0
+  - scikit-learn>=1.5
   - scikit-image
-  - matplotlib
+  - matplotlib>=3.8
   - h5py
+  - pytorch=2.5
+  - torchvision=0.20
+  - pytorch-cuda=12.1
   - pip:
-    - qiskit
-    - qiskit-aer
-    - qiskit-ibm-provider
-    - torchquantum
-    - pyscf
-    - keras
-    - medmnist
-    - tensorpack
-    - torchdiffeq
-    - torchpack
-    - fastapi
-    - uvicorn
-    - loguru
-    - tqdm
-    - fire
-    - dill
-    - python-multipart
+      - fastapi==0.128.0
+      - uvicorn==0.40.0
+      - python-multipart
+      - loguru
+      - tqdm
+      - fire
+      - tensorflow 
+      - keras
+      - medmnist
+      - tensorpack
+      - torchdiffeq
+      - torchpack
+      - qiskit==0.46.3
+      - qiskit-terra==0.46.3
+      - qiskit-aer==0.13.3
+      - qiskit-ibm-provider==0.11.0
+      - qiskit-ibm-runtime==0.20.0
+      - dill
+      - opt_einsum
+      - pathos
+      - pylatexenc
+      - pyscf
+      - requests
+      - requests-ntlm
+      - websocket-client
+      - websockets
+      - rich
+      - torchquantum==0.1.8
