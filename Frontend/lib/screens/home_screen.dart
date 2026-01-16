@@ -89,11 +89,13 @@ class _QuantumHomePageState extends State<QuantumHomePage> {
     });
 
     final queryParams = {
-      'target_parts': selectedTargetCodes.map((code) => code.toLowerCase()).join(','),
+      'target_parts':
+          selectedTargetCodes.map((code) => code.toLowerCase()).join(','),
       'n_qubits': nQubitsController.text,
       'variant_counts': '3',
       'sample_count': '5',
-      'dummy_codes': selectedDummyCodes.map((code) => code.toLowerCase()).join(','),
+      'dummy_codes':
+          selectedDummyCodes.map((code) => code.toLowerCase()).join(','),
       'layer': selectedLayer,
       'batch_size': batchSizeController.text,
       'depth': depthController.text,
@@ -129,7 +131,7 @@ class _QuantumHomePageState extends State<QuantumHomePage> {
 
     final nQubits = nQubitsController.text;
     final url =
-        'http://localhost:8000/download-dummy/$index?n_qubits=$nQubits&include_info=true&allow_partial=true';
+        'http://localhost:8000/download-dummy-all/?n_qubits=$nQubits&include_info=true&allow_partial=true';
 
     setState(() {
       log.add('>: [Export] Requesting download from: $url');
@@ -333,8 +335,7 @@ if __name__ == "__main__":
         });
       } else {
         setState(() {
-          log.add(
-              '>: [Upload] Upload failed: ${streamedResponse.statusCode}');
+          log.add('>: [Upload] Upload failed: ${streamedResponse.statusCode}');
           log.add('>: Error content: $responseBody');
         });
       }
@@ -477,7 +478,8 @@ if __name__ == "__main__":
                                 PartSelection(
                                   selectedTargetCodes: selectedTargetCodes,
                                   selectedDummyCodes: selectedDummyCodes,
-                                  onTargetCodeChanged: (code, val) => setState(() {
+                                  onTargetCodeChanged: (code, val) =>
+                                      setState(() {
                                     if (val) {
                                       selectedTargetCodes.add(code);
                                     } else {
@@ -512,14 +514,16 @@ if __name__ == "__main__":
                                       flex: 2,
                                       child: HyperparameterConfig(
                                         nQubitsController: nQubitsController,
-                                        batchSizeController: batchSizeController,
+                                        batchSizeController:
+                                            batchSizeController,
                                         depthController: depthController,
                                         epochsController: epochsController,
-                                        optimizerController: optimizerController,
+                                        optimizerController:
+                                            optimizerController,
                                         lrController: lrController,
                                         numberOfDummies: numberOfDummies,
-                                        onNumberChanged: (val) =>
-                                            setState(() => numberOfDummies = val),
+                                        onNumberChanged: (val) => setState(
+                                            () => numberOfDummies = val),
                                         onGeneratePressed: generateDummies,
                                       ),
                                     ),
@@ -534,14 +538,16 @@ if __name__ == "__main__":
                                         .map((e) => e['dummy_id'] as String)
                                         .toList(),
                                     dummyData: dummyData,
-                                    selectedDummyCode: selectedDummyCode
-                                                .isNotEmpty &&
-                                            dummyData.any((e) =>
-                                                e['dummy_id'] == selectedDummyCode)
-                                        ? selectedDummyCode
-                                        : (dummyData.isNotEmpty
-                                            ? dummyData.first['dummy_id'] as String
-                                            : ''),
+                                    selectedDummyCode:
+                                        selectedDummyCode.isNotEmpty &&
+                                                dummyData.any((e) =>
+                                                    e['dummy_id'] ==
+                                                    selectedDummyCode)
+                                            ? selectedDummyCode
+                                            : (dummyData.isNotEmpty
+                                                ? dummyData.first['dummy_id']
+                                                    as String
+                                                : ''),
                                     selectedDummyCodes: selectedDummyCodes,
                                     onDummyCodeChanged: (code) => setState(() {
                                       selectedDummyCode = code;
@@ -558,7 +564,8 @@ if __name__ == "__main__":
                               PartSelection(
                                 selectedTargetCodes: selectedTargetCodes,
                                 selectedDummyCodes: selectedDummyCodes,
-                                onTargetCodeChanged: (code, val) => setState(() {
+                                onTargetCodeChanged: (code, val) =>
+                                    setState(() {
                                   if (val) {
                                     selectedTargetCodes.add(code);
                                   } else {
@@ -617,10 +624,12 @@ if __name__ == "__main__":
                                   selectedDummyCode: selectedDummyCode
                                               .isNotEmpty &&
                                           dummyData.any((e) =>
-                                              e['dummy_id'] == selectedDummyCode)
+                                              e['dummy_id'] ==
+                                              selectedDummyCode)
                                       ? selectedDummyCode
                                       : (dummyData.isNotEmpty
-                                          ? dummyData.first['dummy_id'] as String
+                                          ? dummyData.first['dummy_id']
+                                              as String
                                           : ''),
                                   selectedDummyCodes: selectedDummyCodes,
                                   onDummyCodeChanged: (code) => setState(() {
