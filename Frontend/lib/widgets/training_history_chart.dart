@@ -150,8 +150,14 @@ class _LineChartPainter extends CustomPainter {
     );
     if (plotRect.width <= 0 || plotRect.height <= 0) return;
 
-    final xMin = x.reduce(math.min);
-    final xMax = x.reduce(math.max);
+    final xMinRaw = x.reduce(math.min);
+    final xMaxRaw = x.reduce(math.max);
+    
+    // Ensure X-axis starts at 1.0 (or 0.0 if data contains it)
+    final xMin = math.min(xMinRaw, 1.0);
+    // Ensure at least 1 epoch range for better visualization
+    final xMax = math.max(xMaxRaw, xMin + 1.0);
+
     final yMinRaw = y.reduce(math.min);
     final yMaxRaw = y.reduce(math.max);
 
@@ -217,23 +223,23 @@ class _LineChartPainter extends CustomPainter {
     _drawText(
       canvas,
       Offset(0, plotRect.top - 2),
-      _formatNumber(yMax),
+      _formatNumber(yMax, 3),
       textStyle,
     );
     _drawText(
       canvas,
       Offset(0, plotRect.bottom - 10),
-      _formatNumber(yMin),
+      _formatNumber(yMin, 3),
       textStyle,
     );
 
     _drawText(
       canvas,
       Offset(plotRect.left, plotRect.bottom + 6),
-      _formatNumber(xMin),
+      _formatNumber(xMin, 0),
       textStyle,
     );
-    final lastLabel = _formatNumber(xMax);
+    final lastLabel = _formatNumber(xMax, 0);
     final lastTp = _textPainter(lastLabel, textStyle)..layout();
     _drawText(
       canvas,
@@ -243,11 +249,8 @@ class _LineChartPainter extends CustomPainter {
     );
   }
 
-  String _formatNumber(double v) {
-    if (v.abs() >= 1000) return v.toStringAsFixed(0);
-    if (v.abs() >= 10) return v.toStringAsFixed(2);
-    if (v.abs() >= 1) return v.toStringAsFixed(3);
-    return v.toStringAsFixed(4);
+  String _formatNumber(double v, int fractionDigits) {
+    return v.toStringAsFixed(fractionDigits);
   }
 
   TextPainter _textPainter(String text, TextStyle style) {
