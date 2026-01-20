@@ -29,6 +29,7 @@ class _QuantumHomePageState extends State<QuantumHomePage> {
   final log = <String>['>: Ready.'];
   String selectedDummyCode = ''; // DummyGeneration용 단일 선택 상태
   WebSocketChannel? _logChannel;
+  String? _activeRunId;
 
   final nQubitsController = TextEditingController(text: '6');
   final batchSizeController = TextEditingController(text: '1');
@@ -50,9 +51,87 @@ class _QuantumHomePageState extends State<QuantumHomePage> {
     _logChannel =
         WebSocketChannel.connect(Uri.parse('ws://localhost:8000/ws/logs'));
     _logChannel!.stream.listen((message) {
-      setState(() {
-        log.add('WS: $message');
-      });
+      Map<String, dynamic>? data;
+      try {
+        if (message is String) {
+          final decoded = jsonDecode(message);
+          if (decoded is Map) {
+            data = Map<String, dynamic>.from(decoded);
+          }
+        } else if (message is Map) {
+          data = Map<String, dynamic>.from(message);
+        }
+      } catch (_) {
+        data = null;
+      }
+
+      // 1) 에포크 끝 이벤트만 반영 (요구사항: 꼭 epoch 단위)
+      if (data != null && data['type'] == 'train_epoch_end') {
+        final runId = (data['run_id'] ?? '').toString();
+        // 다른 run의 이벤트는 무시 (로그/히스토리 mismatch 방지)
+        if (_activeRunId != null && runId.isNotEmpty && runId != _activeRunId) {
+          return;
+        }
+
+        final dummyId = (data['dummy_id'] ?? '').toString();
+        final epoch = (data['epoch'] as num?)?.toInt();
+        final trainLoss = (data['train_loss'] as num?)?.toDouble();
+        final trainAcc = (data['train_acc'] as num?)?.toDouble();
+
+        if (dummyId.isNotEmpty &&
+            epoch != null &&
+            trainLoss != null &&
+            trainAcc != null) {
+          setState(() {
+            final idx =
+                dummyData.indexWhere((e) => e['dummy_id'].toString() == dummyId);
+            if (idx != -1) {
+              final cur = Map<String, dynamic>.from(dummyData[idx]);
+              final rawHistory =
+                  (cur['history'] as List<dynamic>?) ?? <dynamic>[];
+              final history = rawHistory
+                  .map<Map<String, dynamic>>((h) => h is Map
+                      ? Map<String, dynamic>.from(h)
+                      : <String, dynamic>{})
+                  .toList();
+
+              // 같은 epoch가 이미 있으면 업데이트(덮어쓰기), 없으면 append
+              final existing =
+                  history.indexWhere((h) => (h['epoch'] as num?)?.toInt() == epoch);
+              final point = <String, dynamic>{
+                'epoch': epoch,
+                'train_loss': trainLoss,
+                'train_acc': trainAcc,
+              };
+              if (existing >= 0) {
+                history[existing] = point;
+              } else {
+                history.add(point);
+              }
+
+              cur['history'] = history;
+              dummyData[idx] = cur;
+            }
+          });
+          return;
+        }
+      }
+
+      // 2) 일반 message 로그는 기존대로 LogPanel에 표시
+      if (data != null && data['message'] is String) {
+        final msg = data['message'] as String;
+        final runId = (data['run_id'] ?? '').toString();
+        if (_activeRunId != null && runId.isNotEmpty && runId != _activeRunId) {
+          return;
+        }
+        setState(() {
+          log.add('WS: $msg');
+        });
+      } else {
+        setState(() {
+          log.add('WS: $message');
+        });
+      }
     }, onDone: () {
       setState(() {
         log.add('>: WebSocket closed');
@@ -84,8 +163,44 @@ class _QuantumHomePageState extends State<QuantumHomePage> {
   }
 
   Future<void> runTestWithSavedWeights() async {
+    // Run에서도 WS를 연결해야 실시간 epoch_end 이벤트를 받을 수 있음
+    connectLogWebSocket();
+
+    final runId = DateTime.now().millisecondsSinceEpoch.toString();
+    setState(() {
+      _activeRunId = runId;
+    });
+
     setState(() {
       log.add('>: [Run] Starting API request...');
+    });
+
+    // IMPORTANT: 기존 dummyData(더미 정보/이미지)를 덮어쓰지 않는다.
+    // 대신 history 필드만 보장해서 실시간 epoch_end 업데이트가 들어갈 자리를 만든다.
+    setState(() {
+      for (var i = 0; i < dummyData.length; i++) {
+        final cur = Map<String, dynamic>.from(dummyData[i]);
+        cur['history'] = (cur['history'] as List<dynamic>?)?.cast<Map<String, dynamic>>() ??
+            <Map<String, dynamic>>[];
+        dummyData[i] = cur;
+      }
+
+      // 만약 아직 더미를 generate 하지 않은 상태면 최소 슬롯만 준비(이미지는 어차피 없음)
+      if (dummyData.isEmpty) {
+        dummyData = List.generate(numberOfDummies, (i) {
+          return <String, dynamic>{
+            'dummy_id': (i + 1).toString(),
+            'accuracy': 0.0,
+            'train_seconds': 0.0,
+            'history': <Map<String, dynamic>>[],
+            'info': <String, dynamic>{},
+          };
+        });
+      }
+
+      if (selectedDummyCode.isEmpty && dummyData.isNotEmpty) {
+        selectedDummyCode = dummyData.first['dummy_id'] as String;
+      }
     });
 
     final queryParams = {
@@ -104,6 +219,7 @@ class _QuantumHomePageState extends State<QuantumHomePage> {
       'optimizer': optimizerController.text,
       'lr': lrController.text,
       'variant_count': numberOfDummies.toString(),
+      'run_id': runId,
     };
 
     await _sendApiRequest('/run-multi-test', queryParams);
@@ -402,6 +518,13 @@ if __name__ == "__main__":
                   'info': info,
                 };
               }).toList();
+
+              // dummy_id 기준 정렬(표/로그/히스토리 매칭 안정화)
+              dummyData.sort((a, b) {
+                final ai = int.tryParse(a['dummy_id'].toString()) ?? 0;
+                final bi = int.tryParse(b['dummy_id'].toString()) ?? 0;
+                return ai.compareTo(bi);
+              });
             } else {
               dummyData = [];
             }
@@ -431,6 +554,13 @@ if __name__ == "__main__":
                   'info': info,
                 };
               }).toList();
+
+              // dummy_id 기준 정렬
+              dummyData.sort((a, b) {
+                final ai = int.tryParse(a['dummy_id'].toString()) ?? 0;
+                final bi = int.tryParse(b['dummy_id'].toString()) ?? 0;
+                return ai.compareTo(bi);
+              });
             } else {
               dummyData = [];
             }

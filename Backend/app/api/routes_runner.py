@@ -5,7 +5,7 @@ router = APIRouter()
 
 @router.get("/run-job")
 def run_job():
-    result = run_qnn_inference("generated_code", sample_count=10)
+    result = run_qnn_inference("generated_code", sample_count=10, run_id="single-run")
     print("acc", result["accuracy"])
     print("total", result["samples_evaluated"])
     print("train_seconds", result["train_seconds"])

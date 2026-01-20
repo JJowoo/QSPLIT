@@ -331,7 +331,8 @@ def run_qnn_inference(
     log_callback=None,
     train_epochs: int = 0,
     train_parts: List[str] = ["encoder", "pqc", "mea"],
-    dummy_id: Optional[int] = None
+    dummy_id: Optional[int] = None,
+    run_id: Optional[str] = None,
 ) -> dict:
 
     file_map = file_map or {}
@@ -340,9 +341,6 @@ def run_qnn_inference(
     encoder_path = Path(file_map["encoder"]) if "encoder" in file_map else base_path / "StateEncoder6QDummy.py"
     pqc_path     = Path(file_map["pqc"])     if "pqc"     in file_map else base_path / "PQC6QDummy.py"
     mea_path     = Path(file_map["mea"])     if "mea"     in file_map else base_path / "MEA6QDummy.py"
-
-    if log_callback:
-        log_callback({"message": "Loading modules..."})
 
     print(f"Loaded encoder: {encoder_path.resolve()}")
     print(f"Loaded pqc:     {pqc_path.resolve()}")
@@ -363,10 +361,8 @@ def run_qnn_inference(
         )
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    if log_callback:
-        log_callback({"message": f"[Dummy {dummy_id}] Using device: {device}"})
-    else:
-        print(f"[Dummy {dummy_id}] Using device: {device}")
+    # 사용자 요청: Log panel에 CUDA/디바이스 정보는 보내지 않음
+    print(f"[Dummy {dummy_id}] Using device: {device}")
 
     print("device:", device)
 
@@ -477,7 +473,19 @@ def run_qnn_inference(
             })
 
             if log_callback:
-                log_callback({"message": f"[Dummy {dummy_id}] Epoch {epoch+1}: Loss={avg_loss:.4f}, Acc={acc_train:.4f}"})
+                # --- real-time progress (per epoch) ---
+                log_callback({
+                    "type": "train_epoch_end",
+                    "run_id": run_id,
+                    "dummy_id": dummy_id,
+                    "epoch": int(epoch + 1),
+                    "train_loss": float(avg_loss),
+                    "train_acc": float(acc_train),
+                })
+                log_callback({
+                    "run_id": run_id,
+                    "message": f"[Dummy {dummy_id}] Epoch {epoch+1}: Loss={avg_loss:.4f}, Acc={acc_train:.4f}"
+                })
 
         train_seconds = time.perf_counter() - t_train_start  
 
@@ -526,8 +534,8 @@ def run_qnn_inference(
     inference_seconds = time.perf_counter() - t_inf_start
     acc = correct / total if total > 0 else 0.0   
 
-    if log_callback:
-        log_callback({"message": f"Inference complete. Accuracy: {acc:.3f}"})
+    # if log_callback:
+    #     log_callback({"run_id": run_id, "message": f"Inference complete. Accuracy: {acc:.3f}"})
 
     # ---------- save weights ----------
     if save_weights and target_parts:

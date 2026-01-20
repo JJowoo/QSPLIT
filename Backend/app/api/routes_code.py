@@ -64,7 +64,8 @@ def generate_code(
             }
 
         results.append({
-            "dummy_id": i,
+            # NOTE: run-multi-test 및 로그 표기와 맞추기 위해 dummy_id는 1부터 시작
+            "dummy_id": i + 1,
             "dummy_parts": dummy_info
         })
 

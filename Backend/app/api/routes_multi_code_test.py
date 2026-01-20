@@ -8,8 +8,9 @@ from app.services.log_broadcaster import log_broadcaster  # 공용 broadcaster
 import json
 
 import multiprocessing as mp
-from concurrent.futures import ProcessPoolExecutor, as_completed
+from concurrent.futures import ProcessPoolExecutor, wait, FIRST_COMPLETED
 import traceback
+import queue as pyqueue
 
 import time, uuid
 from datetime import datetime
@@ -57,9 +58,10 @@ def _worker_run_single_dummy(job: Dict[str, Any]) -> Dict[str, Any]:
             target_parts=job["target_parts"],
             save_weights=True,
             save_dir=job["save_dir"],
-            log_callback=None,                  # 병렬에서는 부모에서만 log_to_queue
+            log_callback=_worker_log_callback,  # 워커 → mp.Queue로 progress 전송 (에포크 단위)
             train_epochs=job["train_epochs"],
             dummy_id=job["dummy_id"],
+            run_id=job.get("run_id"),
         )
 
         return {
@@ -122,10 +124,12 @@ def run_multi_test(
     train_epochs: int = 5,
     max_concurrent: int = 3,   # 추가: 동시에 돌릴 더미 수
     depth: int = 2,            # PQC 레이어 깊이
+    run_id: str | None = None,
 ):
     base_dir = Path("generated_code").resolve()
     upload_dir = base_dir / "upload"
     results: List[Dict[str, Any]] = []
+    run_id = run_id or str(uuid.uuid4())
 
     all_parts = {"encoder", "pqc", "mea"}
     selected_parts = set(target_parts)
@@ -185,35 +189,62 @@ def run_multi_test(
             "target_parts": target_parts,
             "save_dir": "./trained_weights",
             "train_epochs": train_epochs,
+            "run_id": run_id,
         })
 
     # 4) 병렬 실행
     max_workers = max(1, min(max_concurrent, variant_count))
     ctx = mp.get_context("spawn")
+    log_q = ctx.Queue()
+    log_to_queue({"run_id": run_id, "message": f"Starting parallel run: variants={variant_count}, max_concurrent={max_workers}"})
 
-    log_to_queue({"message": f"Starting parallel run: variants={variant_count}, max_concurrent={max_workers}"})
+    def _drain_log_q_nonblocking():
+        # IMPORTANT: 별도 thread를 만들지 말고(AnyIO portal 없음), 현재 요청 처리 thread에서만 drain
+        while True:
+            try:
+                payload = log_q.get_nowait()
+            except pyqueue.Empty:
+                break
+            except Exception:
+                break
+            if isinstance(payload, dict):
+                log_to_queue(payload)
 
-    with ProcessPoolExecutor(max_workers=max_workers, mp_context=ctx) as ex:
+    with ProcessPoolExecutor(
+        max_workers=max_workers,
+        mp_context=ctx,
+        initializer=_init_worker,
+        initargs=(log_q,),
+    ) as ex:
         fut_map = {ex.submit(_worker_run_single_dummy, job): job["dummy_id"] for job in jobs}
+        pending = set(fut_map.keys())
 
-        for fut in as_completed(fut_map):
-            dummy_id = fut_map[fut]
-            out = fut.result()
+        while pending:
+            done, pending = wait(pending, timeout=0.2, return_when=FIRST_COMPLETED)
+            _drain_log_q_nonblocking()
 
-            # 워커가 만든 메시지를 부모가 websocket으로 전송
-            if "log_message" in out:
-                log_to_queue({"message": out["log_message"]})
-            else:
-                # 완료 로그(원하면 형식 변경 가능)
-                if out.get("status") == "ok":
-                    log_to_queue({
-                        "message": f"[Dummy {dummy_id}] Done. Acc={out.get('accuracy',0.0):.3f}, train={out.get('train_seconds',0.0):.2f}s"
-                    })
+            for fut in done:
+                dummy_id = fut_map[fut]
+                out = fut.result()
 
-            # info 결합 후 결과 저장
-            out["info"] = dummy_info_map.get(dummy_id, {})
-            results.append(out)
+                # 워커가 만든 메시지를 부모가 websocket으로 전송
+                if "log_message" in out:
+                    log_to_queue({"run_id": run_id, "message": out["log_message"]})
+                else:
+                    # 완료 로그(원하면 형식 변경 가능)
+                    if out.get("status") == "ok":
+                        log_to_queue({
+                            "run_id": run_id,
+                            "message": f"[Dummy {dummy_id}] Done. Acc={out.get('accuracy',0.0):.3f}, train={out.get('train_seconds',0.0):.2f}s"
+                        })
+
+                # info 결합 후 결과 저장
+                out["info"] = dummy_info_map.get(dummy_id, {})
+                results.append(out)
+
+        # 남은 로그 flush
+        _drain_log_q_nonblocking()
 
     # 5) 응답은 dummy_id 순으로 정렬해서 프론트가 보기 좋게
     results.sort(key=lambda x: x["dummy_id"])
-    return {"total_variants": variant_count, "results": results}
+    return {"run_id": run_id, "total_variants": variant_count, "results": results}

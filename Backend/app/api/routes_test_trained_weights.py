@@ -38,7 +38,8 @@ def test_saved_weights(
             load_weights={part: str(weight_path)},  # pass weight path for loading
             target_parts=[part],  # just for logging maybe
             save_weights=False,
-            log_callback=log_to_queue
+            log_callback=log_to_queue,
+            run_id="test-saved-weights",
         )
         result["part"] = part
         results.append(result)

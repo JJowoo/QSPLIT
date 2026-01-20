@@ -76,6 +76,7 @@ class ResultsPanel extends StatelessWidget {
                           rows: dummyData.asMap().entries.map((entry) {
                             final idx = entry.key;
                             final dummy = entry.value;
+                            final dummyId = (dummy['dummy_id'] ?? (idx + 1)).toString();
                             final accuracy =
                                 dummy['accuracy'] as double? ?? 0.0;
                             final trainSeconds =
@@ -85,7 +86,7 @@ class ResultsPanel extends StatelessWidget {
                                 const <Map<String, dynamic>>[];
                             return DataRow(
                               cells: [
-                                DataCell(Text('Dummy#${idx + 1}',
+                                DataCell(Text('Dummy#$dummyId',
                                     overflow: TextOverflow.ellipsis)),
                                 DataCell(Text(accuracy.toStringAsFixed(3))),
                                 DataCell(Text(
@@ -99,7 +100,7 @@ class ResultsPanel extends StatelessWidget {
                                             showDialog<void>(
                                               context: context,
                                               builder: (ctx) => AlertDialog(
-                                                title: Text('Dummy#${idx + 1}'),
+                                                title: Text('Dummy#$dummyId'),
                                                 content: SizedBox(
                                                   width: (() {
                                                     final w = MediaQuery.of(ctx)
