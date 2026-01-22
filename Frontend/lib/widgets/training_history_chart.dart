@@ -13,7 +13,7 @@ class TrainingHistoryChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (history.isEmpty) {
-      return const Text('학습 히스토리가 없습니다.');
+      return const Text('No training history is available.');
     }
 
     final epochs = history
@@ -32,7 +32,7 @@ class TrainingHistoryChart extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _ChartSection(
-          title: 'Train Loss',
+          title: 'Training Loss',
           subtitle: 'epoch → loss',
           x: epochs,
           y: losses,
@@ -40,7 +40,7 @@ class TrainingHistoryChart extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         _ChartSection(
-          title: 'Train Accuracy',
+          title: 'Training Accuracy',
           subtitle: 'epoch → acc',
           x: epochs,
           y: accs,
@@ -152,7 +152,7 @@ class _LineChartPainter extends CustomPainter {
 
     final xMinRaw = x.reduce(math.min);
     final xMaxRaw = x.reduce(math.max);
-    
+
     // Ensure X-axis starts at 1.0 (or 0.0 if data contains it)
     final xMin = math.min(xMinRaw, 1.0);
     // Ensure at least 1 epoch range for better visualization
