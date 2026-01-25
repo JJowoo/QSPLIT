@@ -4,9 +4,18 @@ from fastapi.responses import StreamingResponse
 from pathlib import Path
 from typing import List
 import io, zipfile, datetime, re
+from jinja2 import Environment, FileSystemLoader, select_autoescape
+
 
 router = APIRouter()
 BASE_DIR = Path("generated_code")
+
+TEMPLATE_DIR = Path("app/templates").resolve()  # run_dummy_template.j2 위치에 맞춰 조정
+jinja_env = Environment(
+    loader=FileSystemLoader(str(TEMPLATE_DIR)),
+    autoescape=select_autoescape(enabled_extensions=()),  # 파이썬 코드는 autoescape 끔
+)
+RUN_TPL_NAME = "run_dummy_template.j2"
 
 def _candidate_paths(n_qubits: int, index: int) -> List[Path]:
     """
@@ -36,6 +45,28 @@ def _list_indices(n_qubits: int) -> List[int]:
             indices.add(int(m.group(1)))
     return sorted(indices)
 
+def _render_run_py(
+    n_qubits: int,
+    encoder_filename: str = "",
+    pqc_filename: str = "",
+    mea_filename: str = "",
+    train_epochs: int = 5,
+    batch_size: int = 100,
+    lr: float = 1e-3,
+    eval_samples: int = 2000,
+) -> str:
+    tpl = jinja_env.get_template(RUN_TPL_NAME)
+    return tpl.render(
+        n_qubits=n_qubits,
+        encoder_filename=encoder_filename or "",
+        pqc_filename=pqc_filename or "",
+        mea_filename=mea_filename or "",
+        train_epochs=train_epochs,
+        batch_size=batch_size,
+        lr=lr,
+        eval_samples=eval_samples,
+    )
+
 @router.get("/download-dummy-all")
 def download_all_dummy_bundles(
     n_qubits: int = Query(6),
@@ -51,6 +82,7 @@ def download_all_dummy_bundles(
 
     # 고정 encoder(인덱스 없음)
     fixed_encoder = BASE_DIR / f"StateEncoder{n_qubits}QDummy.py"
+
 
     buf = io.BytesIO()
     missing_total = []  # allow_partial=False일 때 에러 메시지용
@@ -91,8 +123,13 @@ def download_all_dummy_bundles(
             # ZIP 내부 경로: idx 폴더로 묶어주면 보기 좋음
             folder = f"dummy_{idx}/"
 
+            encoder_written = False
+            pqc_written = False
+            mea_written = False
+
             if encoder_file and encoder_file.exists():
                 zf.write(encoder_file, arcname=folder + encoder_file.name)
+                encoder_written = True
                 if include_info:
                     info = _info_path(encoder_file)
                     if info.exists():
@@ -100,6 +137,7 @@ def download_all_dummy_bundles(
 
             if pqc_file.exists():
                 zf.write(pqc_file, arcname=folder + pqc_file.name)
+                pqc_written = True
                 if include_info:
                     info = _info_path(pqc_file)
                     if info.exists():
@@ -107,10 +145,29 @@ def download_all_dummy_bundles(
 
             if mea_file.exists():
                 zf.write(mea_file, arcname=folder + mea_file.name)
+                mea_written = True
                 if include_info:
                     info = _info_path(mea_file)
                     if info.exists():
                         zf.write(info, arcname=folder + info.name)
+
+            
+            encoder_name = encoder_file.name if (encoder_file and encoder_file.exists()) else ""
+            pqc_name     = pqc_file.name     if pqc_file.exists() else ""
+            mea_name     = mea_file.name     if mea_file.exists() else ""
+            run_py = _render_run_py(
+                n_qubits=n_qubits,
+                encoder_filename=encoder_name,
+                pqc_filename=pqc_name,
+                mea_filename=mea_name,
+                train_epochs=5,
+                batch_size=100,
+                lr=1e-3,
+                eval_samples=2000,
+            )
+            zf.writestr(folder + "run.py", run_py)
+
+
 
         if missing_total and not allow_partial:
             raise HTTPException(
