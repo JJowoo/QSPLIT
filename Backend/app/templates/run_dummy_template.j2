@@ -1,0 +1,142 @@
+import argparse
+from pathlib import Path
+import importlib.util
+import time
+
+import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader
+from torchvision import transforms
+from medmnist import INFO
+import medmnist
+
+
+def load_class(py_path: Path, class_name: str):
+    spec = importlib.util.spec_from_file_location(class_name, str(py_path))
+    module = importlib.util.module_from_spec(spec)
+    assert spec and spec.loader
+    spec.loader.exec_module(module)
+    return getattr(module, class_name)
+
+
+def load_pathmnist(split: str, batch_size: int):
+    info = INFO["pathmnist"]
+    DataClass = getattr(medmnist, info["python_class"])
+
+    transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[.5, .5, .5], std=[.5, .5, .5]),
+    ])
+
+    dataset = DataClass(split=split, transform=transform, download=True)
+    loader = DataLoader(dataset, batch_size=batch_size, shuffle=(split=="train"), num_workers=0)
+    return loader
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--n_qubits", type=int, default={{ n_qubits }})
+    ap.add_argument("--train_epochs", type=int, default={{ train_epochs }})
+    ap.add_argument("--batch_size", type=int, default={{ batch_size }})
+    ap.add_argument("--lr", type=float, default={{ lr }})
+    ap.add_argument("--eval_samples", type=int, default={{ eval_samples }})
+    ap.add_argument("--device", type=str, default=("cuda" if torch.cuda.is_available() else "cpu"))
+    args = ap.parse_args()
+
+    root = Path(__file__).resolve().parent
+
+    encoder_py = root / "{{ encoder_filename }}"
+    pqc_py     = root / "{{ pqc_filename }}"
+    mea_py     = root / "{{ mea_filename }}"
+
+    def ensure_file(rel_name: str, label: str) -> Path:
+        if not rel_name:
+            raise SystemExit(f"[ERROR] {label} filename is empty in this bundle.")
+        p = root / rel_name
+        if not p.exists():
+            raise SystemExit(f"[ERROR] {label} file not found: {p}")
+        return p
+
+    encoder_py = ensure_file("{{ encoder_filename }}", "ENCODER")
+    pqc_py     = ensure_file("{{ pqc_filename }}", "PQC")
+    mea_py     = ensure_file("{{ mea_filename }}", "MEA")
+
+    Encoder = load_class(encoder_py, encoder_py.stem)
+    PQC     = load_class(pqc_py, pqc_py.stem)
+    MEA     = load_class(mea_py, mea_py.stem)
+
+    device = torch.device(args.device)
+    encoder = Encoder(n_qubits=args.n_qubits).to(device)
+    pqc     = PQC(n_qubits=args.n_qubits).to(device)
+    mea     = MEA(n_qubits=args.n_qubits).to(device)
+
+    train_loader = load_pathmnist("train", args.batch_size)
+    test_loader  = load_pathmnist("test",  args.batch_size)
+
+    params = [p for p in (list(encoder.parameters()) + list(pqc.parameters()) + list(mea.parameters())) if p.requires_grad]
+    if not params:
+        print("[WARN] No trainable parameters found; skipping training.")
+        args.train_epochs = 0
+
+    optimizer = torch.optim.Adam(params, lr=args.lr) if args.train_epochs > 0 else None
+    criterion = nn.CrossEntropyLoss()
+
+    # ---------------- TRAIN ----------------
+    if args.train_epochs > 0:
+        t0 = time.perf_counter()
+        for ep in range(1, args.train_epochs + 1):
+            encoder.train(); pqc.train(); mea.train()
+            total_loss, correct, total = 0.0, 0, 0
+
+            for images, labels in train_loader:
+                x = images.view(images.size(0), -1).to(device)
+                y = labels.view(-1).long().to(device)
+
+                optimizer.zero_grad()
+                logits = mea(pqc(encoder(x)))
+                if logits.ndim == 1:
+                    logits = logits.unsqueeze(0)
+
+                loss = criterion(logits, y)
+                loss.backward()
+                optimizer.step()
+
+                bs = y.size(0)
+                total_loss += float(loss.item()) * bs
+                pred = torch.argmax(logits, dim=1)
+                correct += int((pred == y).sum().item())
+                total += int(bs)
+
+            avg_loss = (total_loss / total) if total else 0.0
+            acc = (correct / total) if total else 0.0
+            print(f"[TRAIN] epoch={ep} loss={avg_loss:.4f} acc={acc:.4f}")
+
+        print(f"[TIME] train_seconds={time.perf_counter() - t0:.2f}")
+
+    # ---------------- EVAL ----------------
+    encoder.eval(); pqc.eval(); mea.eval()
+    correct, total = 0, 0
+    seen = 0
+    with torch.no_grad():
+        for images, labels in test_loader:
+            if seen >= args.eval_samples:
+                break
+            x = images.view(images.size(0), -1).to(device)
+            y = labels.view(-1).long().to(device)
+
+            logits = mea(pqc(encoder(x)))
+            if logits.ndim == 1:
+                logits = logits.unsqueeze(0)
+
+            pred = torch.argmax(logits, dim=1)
+            bs = y.size(0)
+            correct += int((pred == y).sum().item())
+            total += int(bs)
+            seen += int(bs)
+
+    acc = (correct / total) if total else 0.0
+    print(f"[EVAL] acc={acc:.4f}")
+    print("[DONE]")
+
+if __name__ == "__main__":
+    main()
