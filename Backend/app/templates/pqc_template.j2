@@ -71,7 +71,6 @@ class {{ class_name }}(nn.Module):
         if k > 0:
             params = self.theta[step, :k].unsqueeze(0).repeat(bsz, 1)  # (bsz, k)
 
-        # functional 우선
         if tqf is not None:
             fn = getattr(tqf, gate.lower(), None)
             if fn is not None:
@@ -104,8 +103,18 @@ class {{ class_name }}(nn.Module):
         g(self.qdevice)
 
     def forward(self, x: torch.Tensor):
-        bsz = x.shape[0]
+        # x는 encoder 출력 상태벡터를 받는다. 입력이 없으면 |0...0> 상태에서 시작.
+        if x is None:
+            bsz = 1
+        else:
+            if x.ndim == 1:
+                x = x.unsqueeze(0)
+            bsz = x.shape[0]
+            if not torch.is_complex(x):
+                x = torch.complex(x, torch.zeros_like(x))
         self.qdevice.reset_states(bsz=bsz)
+        if x is not None:
+            self.qdevice.set_states(x)
 
         # apply gate sequence
         for step, gate in enumerate(self.gates):

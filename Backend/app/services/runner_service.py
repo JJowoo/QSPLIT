@@ -401,6 +401,9 @@ def run_qnn_inference(
     
 
     # ---------- TRAIN ----------
+    last_train_loss = None
+    last_train_acc = None
+    max_train_acc = None
     if train_epochs > 0 and trainable_params:
         optimizer = torch.optim.Adam(trainable_params, lr=1e-3)
         criterion = nn.CrossEntropyLoss()
@@ -465,6 +468,8 @@ def run_qnn_inference(
             avg_loss = total_loss / total if total else 0.0
             acc_train = correct / total if total else 0.0
             print(f"[Dummy {dummy_id}] Epoch {epoch+1}: Loss={avg_loss:.4f}, Acc={acc_train:.4f}")
+            last_train_loss = float(avg_loss)
+            last_train_acc = float(acc_train)
 
             history.append({
                 "epoch": int(epoch + 1),
@@ -553,8 +558,18 @@ def run_qnn_inference(
         pass
 
 
+    if history:
+        try:
+            max_train_acc = max(float(h.get("train_acc", 0.0)) for h in history)
+        except Exception:
+            max_train_acc = None
+
     return {
         "accuracy": acc,
+        "test_accuracy": acc,
+        "train_loss": last_train_loss,
+        "train_acc": last_train_acc,
+        "max_train_acc": max_train_acc,
         "samples_evaluated": total,
         "results": results,
         "train_seconds": float(train_seconds),

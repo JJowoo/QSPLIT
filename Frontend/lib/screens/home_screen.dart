@@ -83,8 +83,8 @@ class _QuantumHomePageState extends State<QuantumHomePage> {
             trainLoss != null &&
             trainAcc != null) {
           setState(() {
-            final idx =
-                dummyData.indexWhere((e) => e['dummy_id'].toString() == dummyId);
+            final idx = dummyData
+                .indexWhere((e) => e['dummy_id'].toString() == dummyId);
             if (idx != -1) {
               final cur = Map<String, dynamic>.from(dummyData[idx]);
               final rawHistory =
@@ -96,8 +96,8 @@ class _QuantumHomePageState extends State<QuantumHomePage> {
                   .toList();
 
               // 같은 epoch가 이미 있으면 업데이트(덮어쓰기), 없으면 append
-              final existing =
-                  history.indexWhere((h) => (h['epoch'] as num?)?.toInt() == epoch);
+              final existing = history
+                  .indexWhere((h) => (h['epoch'] as num?)?.toInt() == epoch);
               final point = <String, dynamic>{
                 'epoch': epoch,
                 'train_loss': trainLoss,
@@ -180,8 +180,9 @@ class _QuantumHomePageState extends State<QuantumHomePage> {
     setState(() {
       for (var i = 0; i < dummyData.length; i++) {
         final cur = Map<String, dynamic>.from(dummyData[i]);
-        cur['history'] = (cur['history'] as List<dynamic>?)?.cast<Map<String, dynamic>>() ??
-            <Map<String, dynamic>>[];
+        cur['history'] =
+            (cur['history'] as List<dynamic>?)?.cast<Map<String, dynamic>>() ??
+                <Map<String, dynamic>>[];
         dummyData[i] = cur;
       }
 
@@ -512,7 +513,13 @@ if __name__ == "__main__":
 
                 return {
                   'dummy_id': e['dummy_id'].toString(),
-                  'accuracy': e['accuracy'] ?? 0.0,
+                  'accuracy': e['max_train_acc'] ??
+                      e['train_acc'] ??
+                      e['accuracy'] ??
+                      0.0,
+                  'train_acc': e['train_acc'],
+                  'max_train_acc': e['max_train_acc'],
+                  'test_accuracy': e['test_accuracy'] ?? e['accuracy'],
                   'train_seconds': e['train_seconds'] ?? 0.0,
                   'history': history,
                   'info': info,

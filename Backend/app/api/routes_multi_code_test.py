@@ -68,6 +68,10 @@ def _worker_run_single_dummy(job: Dict[str, Any]) -> Dict[str, Any]:
             "dummy_id": job["dummy_id"],
             "status": "ok",
             "accuracy": result.get("accuracy", 0.0),
+            "train_acc": result.get("train_acc"),
+            "train_loss": result.get("train_loss"),
+            "max_train_acc": result.get("max_train_acc"),
+            "test_accuracy": result.get("test_accuracy", result.get("accuracy", 0.0)),
             "details": result.get("results", []),
             "history": result.get("history", []),
             "train_seconds": result.get("train_seconds", 0.0),
@@ -235,7 +239,7 @@ def run_multi_test(
                     if out.get("status") == "ok":
                         log_to_queue({
                             "run_id": run_id,
-                            "message": f"[Dummy {dummy_id}] Done. Acc={out.get('accuracy',0.0):.3f}, train={out.get('train_seconds',0.0):.2f}s"
+                            "message": f"[Dummy {dummy_id}] Done. Train Acc={out.get('max_train_acc',0.0):.3f}, Test Acc={out.get('accuracy',0.0):.3f}, train={out.get('train_seconds',0.0):.2f}s"
                         })
 
                 # info 결합 후 결과 저장
