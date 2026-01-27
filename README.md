@@ -41,9 +41,6 @@ Define which components of the QNN (SE, PQC, MEA) are provided by the user and w
 
 ## 1. Getting Started
 
-### 🌐 Web Inference (Quick Start)
-Access the live interface without installation: [QSPLIT Web](https://eb355abb2a59.ngrok-free.app/)
-
 ### 💻 Local Setup
 **Prerequisites:**
 - **Python** ≥ 3.12 | **Flutter** 3.32.8
