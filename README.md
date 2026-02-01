@@ -11,7 +11,7 @@
 ## 🛠 Tool Components
 
 <p align="center">
-  <img width="1794" height="1068" alt="Group 26" src="https://github.com/user-attachments/assets/16be648f-2017-4cb9-bbbe-31daff43afb9" />
+  <img width="3927" height="1997" alt="Fig" src="https://github.com/user-attachments/assets/e37bd16a-190b-4282-b307-12fac0d27d19" />
 </p>
 
 
