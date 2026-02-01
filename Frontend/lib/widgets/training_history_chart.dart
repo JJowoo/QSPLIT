@@ -83,7 +83,7 @@ class _ChartSection extends StatelessWidget {
         Text(title, style: textTheme.titleMedium),
         const SizedBox(height: 4),
         Text(subtitle,
-            style: textTheme.bodySmall?.copyWith(color: Colors.grey)),
+            style: textTheme.bodyLarge?.copyWith(color: Colors.grey)),
         const SizedBox(height: 8),
         SizedBox(
           height: 180,
