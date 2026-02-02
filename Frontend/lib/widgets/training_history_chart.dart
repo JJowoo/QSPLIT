@@ -13,7 +13,8 @@ class TrainingHistoryChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (history.isEmpty) {
-      return const Text('No training history is available.');
+      return Text('No training history is available.',
+          style: Theme.of(context).textTheme.titleMedium);
     }
 
     final epochs = history
@@ -80,10 +81,15 @@ class _ChartSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(title, style: textTheme.titleMedium),
+        Text(
+          title,
+          style: textTheme.headlineMedium,
+        ),
         const SizedBox(height: 4),
-        Text(subtitle,
-            style: textTheme.bodyLarge?.copyWith(color: Colors.grey)),
+        Text(
+          subtitle,
+          style: textTheme.titleLarge?.copyWith(color: Colors.grey),
+        ),
         const SizedBox(height: 8),
         SizedBox(
           height: 180,
@@ -100,8 +106,8 @@ class _ChartSection extends StatelessWidget {
                   y: y,
                   lineColor: lineColor,
                   gridColor: colorScheme.outlineVariant.withAlpha(179),
-                  textStyle: textTheme.labelSmall ??
-                      const TextStyle(fontSize: 10, color: Colors.grey),
+                  textStyle: textTheme.bodyMedium?.copyWith(color: Colors.black) ??
+                      const TextStyle(fontSize: 14, color: Colors.black),
                   yMinOverride: yMinOverride,
                   yMaxOverride: yMaxOverride,
                 ),
@@ -137,7 +143,7 @@ class _LineChartPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (x.isEmpty || y.isEmpty || x.length != y.length) return;
 
-    const leftPad = 34.0;
+    const leftPad = 48.0;
     const rightPad = 12.0;
     const topPad = 10.0;
     const bottomPad = 24.0;
@@ -222,13 +228,13 @@ class _LineChartPainter extends CustomPainter {
     // Labels (min/max + first/last epoch)
     _drawText(
       canvas,
-      Offset(0, plotRect.top - 2),
+      Offset(4, plotRect.top - 2),
       _formatNumber(yMax, 3),
       textStyle,
     );
     _drawText(
       canvas,
-      Offset(0, plotRect.bottom - 10),
+      Offset(4, plotRect.bottom - 10),
       _formatNumber(yMin, 3),
       textStyle,
     );
