@@ -81,6 +81,13 @@ class _ChartSection extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
 
+    // 🔥 글자 크기 키움
+    final chartTextStyle =
+        (textTheme.bodyMedium ?? const TextStyle()).copyWith(
+      color: Colors.black,
+      fontSize: 16,
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -107,9 +114,7 @@ class _ChartSection extends StatelessWidget {
                   lineColor: lineColor,
                   gridColor:
                       colorScheme.outlineVariant.withAlpha(179),
-                  textStyle:
-                      textTheme.bodyMedium?.copyWith(color: Colors.black) ??
-                          const TextStyle(fontSize: 14),
+                  textStyle: chartTextStyle,
                   yMinOverride: yMinOverride,
                   yMaxOverride: yMaxOverride,
                 ),
@@ -180,20 +185,19 @@ class _LineChartPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.0;
 
-    // 🔥 tick 라인 (검정, 두께 1)
     final tickPaint = Paint()
       ..color = Colors.black
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.0;
 
+    // Grid
     for (var i = 0; i <= 4; i++) {
       final t = i / 4.0;
       final yPos = plotRect.top + plotRect.height * t;
       canvas.drawLine(
-        Offset(plotRect.left, yPos),
-        Offset(plotRect.right, yPos),
-        gridPaint,
-      );
+          Offset(plotRect.left, yPos),
+          Offset(plotRect.right, yPos),
+          gridPaint);
     }
 
     canvas.drawRect(plotRect, gridPaint);
@@ -226,6 +230,20 @@ class _LineChartPainter extends CustomPainter {
           ..strokeWidth = 2
           ..style = PaintingStyle.stroke);
 
+    // 🔥 Y축: ymin / ymax만 표시
+    _drawText(
+        canvas,
+        Offset(4, plotRect.top - 8),
+        yMax.toStringAsFixed(3),
+        textStyle);
+
+    _drawText(
+        canvas,
+        Offset(4, plotRect.bottom - 12),
+        yMin.toStringAsFixed(3),
+        textStyle);
+
+    // X ticks (1,5,10,...)
     const tickStep = 5.0;
     const eps = 1e-9;
 
@@ -261,8 +279,17 @@ class _LineChartPainter extends CustomPainter {
       if ((tick - xMin).abs() < eps) dx = plotRect.left;
       if ((tick - xMax).abs() < eps) dx = plotRect.right - tp.width;
 
-      tp.paint(canvas, Offset(dx, plotRect.bottom + 8));
+      tp.paint(canvas, Offset(dx, plotRect.bottom + 6));
     }
+  }
+
+  void _drawText(
+      Canvas canvas, Offset offset, String text, TextStyle style) {
+    final tp = TextPainter(
+      text: TextSpan(text: text, style: style),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    tp.paint(canvas, offset);
   }
 
   @override
