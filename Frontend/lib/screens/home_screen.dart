@@ -21,6 +21,15 @@ class QuantumHomePage extends StatefulWidget {
 }
 
 class _QuantumHomePageState extends State<QuantumHomePage> {
+  // Backend Configuration
+  // ngrok 사용 시: 'xxxx.ngrok-free.app' (프로토콜 제외)
+  // 로컬 사용 시: 'localhost:8002'
+  final String backendBase = 'c61a-35-216-24-61.ngrok-free.app';
+  final bool useHttps = true; // ngrok 사용 시 true로 변경
+
+  String get httpProtocol => useHttps ? 'https' : 'http';
+  String get wsProtocol => useHttps ? 'wss' : 'ws';
+
   Set<String> selectedTargetCodes = {'SE'};
   Set<String> selectedDummyCodes = {'PQC', 'MEA'};
   String selectedLayer = 'StateEncoder';
@@ -49,7 +58,7 @@ class _QuantumHomePageState extends State<QuantumHomePage> {
   void connectLogWebSocket() {
     _logChannel?.sink.close(); // 기존 연결 종료
     _logChannel =
-        WebSocketChannel.connect(Uri.parse('ws://localhost:8000/ws/logs'));
+        WebSocketChannel.connect(Uri.parse('$wsProtocol://$backendBase/ws/logs'));
     _logChannel!.stream.listen((message) {
       Map<String, dynamic>? data;
       try {
@@ -63,6 +72,59 @@ class _QuantumHomePageState extends State<QuantumHomePage> {
         }
       } catch (_) {
         data = null;
+      }
+
+      // 0) 멀티 테스트 완료 이벤트 (결과 JSON 수신)
+      if (data != null && data['type'] == 'multi_test_finished') {
+        final runId = (data['run_id'] ?? '').toString();
+        // 다른 run의 이벤트는 무시
+        if (_activeRunId != null && runId.isNotEmpty && runId != _activeRunId) {
+          return;
+        }
+        
+        final results = data['results'] as List<dynamic>?;
+        if (results != null) {
+          final parsedData = results.map<Map<String, dynamic>>((e) {
+            final rawInfo = e['info'] ?? {};
+            final info = <String, dynamic>{};
+            rawInfo.forEach((k, v) {
+              info[k] = v is Map ? Map<String, dynamic>.from(v) : v;
+            });
+
+            final rawHistory = e['history'] as List<dynamic>? ?? const [];
+            final history = rawHistory.map<Map<String, dynamic>>((h) {
+              if (h is Map) return Map<String, dynamic>.from(h);
+              return <String, dynamic>{};
+            }).toList();
+
+            return {
+              'dummy_id': e['dummy_id'].toString(),
+              'accuracy': e['max_train_acc'] ??
+                  e['train_acc'] ??
+                  e['accuracy'] ??
+                  0.0,
+              'train_acc': e['train_acc'],
+              'max_train_acc': e['max_train_acc'],
+              'test_accuracy': e['test_accuracy'] ?? e['accuracy'],
+              'train_seconds': e['train_seconds'] ?? 0.0,
+              'history': history,
+              'info': info,
+            };
+          }).toList();
+
+          // 정렬
+          parsedData.sort((a, b) {
+            final ai = int.tryParse(a['dummy_id'].toString()) ?? 0;
+            final bi = int.tryParse(b['dummy_id'].toString()) ?? 0;
+            return ai.compareTo(bi);
+          });
+
+          setState(() {
+            dummyData = parsedData;
+            // log.add('>: [WS] Multi-test finished. Results updated.');
+          });
+        }
+        return;
       }
 
       // 1) 에포크 끝 이벤트만 반영 (요구사항: 꼭 epoch 단위)
@@ -151,7 +213,7 @@ class _QuantumHomePageState extends State<QuantumHomePage> {
 
     // 기본 파라미터들
     String url =
-        'http://localhost:8000/generate-code?n_qubits=${nQubitsController.text}&variant_count=${numberOfDummies.toString()}&depth=${depthController.text}';
+        '$httpProtocol://$backendBase/generate-code?n_qubits=${nQubitsController.text}&variant_count=${numberOfDummies.toString()}&depth=${depthController.text}';
 
     // 각 선택된 Target Code를 개별 파라미터로 추가
     for (final code in selectedTargetCodes) {
@@ -175,18 +237,17 @@ class _QuantumHomePageState extends State<QuantumHomePage> {
       log.add('>: [Run] Starting API request...');
     });
 
-    // IMPORTANT: 기존 dummyData(더미 정보/이미지)를 덮어쓰지 않는다.
-    // 대신 history 필드만 보장해서 실시간 epoch_end 업데이트가 들어갈 자리를 만든다.
+    // IMPORTANT: 새로운 Run 시작 시 기존 히스토리와 결과 초기화
     setState(() {
       for (var i = 0; i < dummyData.length; i++) {
         final cur = Map<String, dynamic>.from(dummyData[i]);
-        cur['history'] =
-            (cur['history'] as List<dynamic>?)?.cast<Map<String, dynamic>>() ??
-                <Map<String, dynamic>>[];
+        cur['history'] = <Map<String, dynamic>>[];
+        cur['accuracy'] = 0.0;
+        cur['train_seconds'] = 0.0;
         dummyData[i] = cur;
       }
 
-      // 만약 아직 더미를 generate 하지 않은 상태면 최소 슬롯만 준비(이미지는 어차피 없음)
+      // 만약 아직 더미를 generate 하지 않은 상태면 최소 슬롯만 준비(이미지는 어차乎 없음)
       if (dummyData.isEmpty) {
         dummyData = List.generate(numberOfDummies, (i) {
           return <String, dynamic>{
@@ -204,26 +265,20 @@ class _QuantumHomePageState extends State<QuantumHomePage> {
       }
     });
 
-    final queryParams = {
-      'target_parts':
-          selectedTargetCodes.map((code) => code.toLowerCase()).join(','),
-      'n_qubits': nQubitsController.text,
-      'variant_counts': '3',
-      'sample_count': '5',
-      'dummy_codes':
-          selectedDummyCodes.map((code) => code.toLowerCase()).join(','),
-      'layer': selectedLayer,
-      'batch_size': batchSizeController.text,
-      'depth': depthController.text,
-      'to_device': 'cuda:0',
-      'train_epochs': epochsController.text,
-      'optimizer': optimizerController.text,
-      'lr': lrController.text,
-      'variant_count': numberOfDummies.toString(),
+    final body = {
+      'target_parts': selectedTargetCodes
+          .map((code) => code == 'SE' ? 'encoder' : code.toLowerCase())
+          .toList(),
+      'n_qubits': int.tryParse(nQubitsController.text) ?? 6,
+      'sample_count': 5,
+      'variant_count': numberOfDummies,
+      'train_epochs': int.tryParse(epochsController.text) ?? 5,
+      'depth': int.tryParse(depthController.text) ?? 2,
       'run_id': runId,
+      'max_concurrent': 6, // Default value
     };
 
-    await _sendApiRequest('/run-multi-test', queryParams);
+    await _sendApiRequest('/run-multi-test', body, method: 'POST');
   }
 
   Future<void> exportDummyWeights() async {
@@ -248,7 +303,7 @@ class _QuantumHomePageState extends State<QuantumHomePage> {
 
     final nQubits = nQubitsController.text;
     final url =
-        'http://localhost:8000/download-dummy-all/?n_qubits=$nQubits&include_info=true&allow_partial=true';
+        '$httpProtocol://$backendBase/download-dummy-all/?n_qubits=$nQubits&include_info=true&allow_partial=true';
 
     setState(() {
       log.add('>: [Export] Requesting download from: $url');
@@ -314,7 +369,8 @@ if __name__ == "__main__":
 
     try {
       final response = await http.get(
-        Uri.parse('http://localhost:8000/api/file/list-files'),
+        Uri.parse('$httpProtocol://$backendBase/api/file/list-files'),
+        headers: {'ngrok-skip-browser-warning': 'true'},
       );
 
       if (response.statusCode == 200) {
@@ -360,7 +416,8 @@ if __name__ == "__main__":
 
     try {
       final response = await http.delete(
-        Uri.parse('http://localhost:8000/api/file/delete-file/$filename'),
+        Uri.parse('$httpProtocol://$backendBase/api/file/delete-file/$filename'),
+        headers: {'ngrok-skip-browser-warning': 'true'},
       );
 
       if (response.statusCode == 200) {
@@ -406,7 +463,7 @@ if __name__ == "__main__":
       // multipart/form-data 요청 생성
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('http://localhost:8000/upload-code'),
+        Uri.parse('$httpProtocol://$backendBase/upload-code'),
       );
 
       // 'part' 필드 추가
@@ -424,6 +481,9 @@ if __name__ == "__main__":
 
       // 파일 추가
       request.files.add(multipartFile);
+
+      // ngrok 경고 우회 헤더 추가
+      request.headers['ngrok-skip-browser-warning'] = 'true';
 
       log.add(
           '>: [Upload] MultipartFile created successfully, sending request...');
@@ -464,30 +524,58 @@ if __name__ == "__main__":
     }
   }
 
-  Future<void> _sendApiRequest(String path, dynamic queryParams) async {
+  Future<void> _sendApiRequest(String path, dynamic params, {String method = 'GET'}) async {
     try {
       Uri uri;
-      if (queryParams is String) {
-        // URL 문자열인 경우
-        uri = Uri.parse(queryParams);
-      } else {
-        // Map인 경우 (기존 방식)
-        final queryParametersAll = <String, List<String>>{};
-        queryParams.forEach((key, value) {
-          if (queryParametersAll.containsKey(key)) {
-            queryParametersAll[key]!.add(value);
-          } else {
-            queryParametersAll[key] = [value];
-          }
+      http.Response response;
+
+      if (method == 'POST') {
+        if (useHttps) {
+          uri = Uri.https(backendBase, path);
+        } else {
+          uri = Uri.http(backendBase, path);
+        }
+        
+        setState(() {
+          log.add('>: Sending POST request to: $uri');
         });
-        uri = Uri.http('localhost:8000', path, queryParametersAll);
+
+        response = await http.post(
+          uri,
+          headers: {
+            'Content-Type': 'application/json',
+            'ngrok-skip-browser-warning': 'true',
+          },
+          body: jsonEncode(params),
+        );
+
+      } else {
+        // GET Request (legacy behavior)
+        if (params is String) {
+          uri = Uri.parse(params);
+        } else {
+          final queryParametersAll = <String, List<String>>{};
+          (params as Map).forEach((key, value) {
+            if (queryParametersAll.containsKey(key)) {
+              queryParametersAll[key]!.add(value.toString());
+            } else {
+              queryParametersAll[key] = [value.toString()];
+            }
+          });
+          
+          if (useHttps) {
+            uri = Uri.https(backendBase, path, queryParametersAll);
+          } else {
+            uri = Uri.http(backendBase, path, queryParametersAll);
+          }
+        }
+
+        setState(() {
+          log.add('>: Sending GET request to: $uri');
+        });
+
+        response = await http.get(uri, headers: {'ngrok-skip-browser-warning': 'true'});
       }
-
-      setState(() {
-        log.add('>: Sending GET request to: $uri');
-      });
-
-      final response = await http.get(uri);
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
@@ -495,46 +583,9 @@ if __name__ == "__main__":
           log.add('>: API request successful!');
           // log.add('>: Response: ${response.body}');
           if (path == '/run-multi-test') {
-            // results 배열에서 dummy_id별 info 파싱
-            final results = responseData['results'] as List<dynamic>?;
-            if (results != null) {
-              dummyData = results.map<Map<String, dynamic>>((e) {
-                final rawInfo = e['info'] ?? {};
-                final info = <String, dynamic>{};
-                rawInfo.forEach((k, v) {
-                  info[k] = v is Map ? Map<String, dynamic>.from(v) : v;
-                });
-
-                final rawHistory = e['history'] as List<dynamic>? ?? const [];
-                final history = rawHistory.map<Map<String, dynamic>>((h) {
-                  if (h is Map) return Map<String, dynamic>.from(h);
-                  return <String, dynamic>{};
-                }).toList();
-
-                return {
-                  'dummy_id': e['dummy_id'].toString(),
-                  'accuracy': e['max_train_acc'] ??
-                      e['train_acc'] ??
-                      e['accuracy'] ??
-                      0.0,
-                  'train_acc': e['train_acc'],
-                  'max_train_acc': e['max_train_acc'],
-                  'test_accuracy': e['test_accuracy'] ?? e['accuracy'],
-                  'train_seconds': e['train_seconds'] ?? 0.0,
-                  'history': history,
-                  'info': info,
-                };
-              }).toList();
-
-              // dummy_id 기준 정렬(표/로그/히스토리 매칭 안정화)
-              dummyData.sort((a, b) {
-                final ai = int.tryParse(a['dummy_id'].toString()) ?? 0;
-                final bi = int.tryParse(b['dummy_id'].toString()) ?? 0;
-                return ai.compareTo(bi);
-              });
-            } else {
-              dummyData = [];
-            }
+            setState(() {
+              log.add('>: [API] Background task started. Waiting for results via WebSocket...');
+            });
           } else if (path == '/generate-code') {
             // generate-code API의 새로운 응답 구조 처리
             final results = responseData['results'] as List<dynamic>?;

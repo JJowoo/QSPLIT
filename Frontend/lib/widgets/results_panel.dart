@@ -100,7 +100,12 @@ class ResultsPanel extends StatelessWidget {
                                             showDialog<void>(
                                               context: context,
                                               builder: (ctx) => AlertDialog(
-                                                title: Text('Dummy#$dummyId'),
+                                                title: Text(
+                                                  'Dummy#$dummyId',
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
                                                 content: SizedBox(
                                                   width: (() {
                                                     final w = MediaQuery.of(ctx)
