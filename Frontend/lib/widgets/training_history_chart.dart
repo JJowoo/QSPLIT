@@ -1,5 +1,4 @@
 import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 
 class TrainingHistoryChart extends StatelessWidget {
@@ -13,16 +12,20 @@ class TrainingHistoryChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (history.isEmpty) {
-      return Text('No training history is available.',
-          style: Theme.of(context).textTheme.titleMedium);
+      return Text(
+        'No training history is available.',
+        style: Theme.of(context).textTheme.titleMedium,
+      );
     }
 
     final epochs = history
         .map((e) => (e['epoch'] as num?)?.toDouble() ?? 0.0)
         .toList(growable: false);
+
     final losses = history
         .map((e) => (e['train_loss'] as num?)?.toDouble() ?? 0.0)
         .toList(growable: false);
+
     final accs = history
         .map((e) => (e['train_acc'] as num?)?.toDouble() ?? 0.0)
         .toList(growable: false);
@@ -81,10 +84,7 @@ class _ChartSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          title,
-          style: textTheme.headlineMedium,
-        ),
+        Text(title, style: textTheme.headlineMedium),
         const SizedBox(height: 4),
         Text(
           subtitle,
@@ -105,9 +105,11 @@ class _ChartSection extends StatelessWidget {
                   x: x,
                   y: y,
                   lineColor: lineColor,
-                  gridColor: colorScheme.outlineVariant.withAlpha(179),
-                  textStyle: textTheme.bodyMedium?.copyWith(color: Colors.black) ??
-                      const TextStyle(fontSize: 14, color: Colors.black),
+                  gridColor:
+                      colorScheme.outlineVariant.withAlpha(179),
+                  textStyle:
+                      textTheme.bodyMedium?.copyWith(color: Colors.black) ??
+                          const TextStyle(fontSize: 14),
                   yMinOverride: yMinOverride,
                   yMaxOverride: yMaxOverride,
                 ),
@@ -159,9 +161,7 @@ class _LineChartPainter extends CustomPainter {
     final xMinRaw = x.reduce(math.min);
     final xMaxRaw = x.reduce(math.max);
 
-    // Ensure X-axis starts at 1.0 (or 0.0 if data contains it)
     final xMin = math.min(xMinRaw, 1.0);
-    // Ensure at least 1 epoch range for better visualization
     final xMax = math.max(xMaxRaw, xMin + 1.0);
 
     final yMinRaw = y.reduce(math.min);
@@ -169,6 +169,7 @@ class _LineChartPainter extends CustomPainter {
 
     double yMin = yMinOverride ?? yMinRaw;
     double yMax = yMaxOverride ?? yMaxRaw;
+
     if ((yMax - yMin).abs() < 1e-12) {
       yMin -= 1.0;
       yMax += 1.0;
@@ -179,34 +180,34 @@ class _LineChartPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.0;
 
-    // Horizontal grid (4 lines)
+    // 🔥 tick 라인 (검정, 두께 1)
+    final tickPaint = Paint()
+      ..color = Colors.black
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+
     for (var i = 0; i <= 4; i++) {
       final t = i / 4.0;
       final yPos = plotRect.top + plotRect.height * t;
       canvas.drawLine(
-          Offset(plotRect.left, yPos), Offset(plotRect.right, yPos), gridPaint);
+        Offset(plotRect.left, yPos),
+        Offset(plotRect.right, yPos),
+        gridPaint,
+      );
     }
 
-    // Border
     canvas.drawRect(plotRect, gridPaint);
 
     double mapX(double xv) {
       if ((xMax - xMin).abs() < 1e-12) return plotRect.left;
-      return plotRect.left + (xv - xMin) / (xMax - xMin) * plotRect.width;
+      return plotRect.left +
+          (xv - xMin) / (xMax - xMin) * plotRect.width;
     }
 
     double mapY(double yv) {
-      return plotRect.bottom - (yv - yMin) / (yMax - yMin) * plotRect.height;
+      return plotRect.bottom -
+          (yv - yMin) / (yMax - yMin) * plotRect.height;
     }
-
-    final linePaint = Paint()
-      ..color = lineColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0;
-
-    final pointPaint = Paint()
-      ..color = lineColor
-      ..style = PaintingStyle.fill;
 
     final path = Path();
     for (var i = 0; i < x.length; i++) {
@@ -217,68 +218,55 @@ class _LineChartPainter extends CustomPainter {
         path.lineTo(p.dx, p.dy);
       }
     }
-    canvas.drawPath(path, linePaint);
 
-    // Points
-    for (var i = 0; i < x.length; i++) {
-      final p = Offset(mapX(x[i]), mapY(y[i]));
-      canvas.drawCircle(p, 3.0, pointPaint);
+    canvas.drawPath(
+        path,
+        Paint()
+          ..color = lineColor
+          ..strokeWidth = 2
+          ..style = PaintingStyle.stroke);
+
+    const tickStep = 5.0;
+    const eps = 1e-9;
+
+    final ticks = <double>[];
+    ticks.add(xMin);
+
+    for (double t = tickStep; t <= xMax + eps; t += tickStep) {
+      if ((t - xMin).abs() < eps) continue;
+      if ((xMax - t).abs() < eps) continue;
+      ticks.add(t);
     }
 
-    // Labels (min/max + first/last epoch)
-    _drawText(
-      canvas,
-      Offset(4, plotRect.top - 2),
-      _formatNumber(yMax, 3),
-      textStyle,
-    );
-    _drawText(
-      canvas,
-      Offset(4, plotRect.bottom - 10),
-      _formatNumber(yMin, 3),
-      textStyle,
-    );
+    if ((ticks.last - xMax).abs() > eps) {
+      ticks.add(xMax);
+    }
 
-    _drawText(
-      canvas,
-      Offset(plotRect.left, plotRect.bottom + 6),
-      _formatNumber(xMin, 0),
-      textStyle,
-    );
-    final lastLabel = _formatNumber(xMax, 0);
-    final lastTp = _textPainter(lastLabel, textStyle)..layout();
-    _drawText(
-      canvas,
-      Offset(plotRect.right - lastTp.width, plotRect.bottom + 6),
-      lastLabel,
-      textStyle,
-    );
-  }
+    for (final tick in ticks) {
+      final tickX = mapX(tick);
 
-  String _formatNumber(double v, int fractionDigits) {
-    return v.toStringAsFixed(fractionDigits);
-  }
+      canvas.drawLine(
+        Offset(tickX, plotRect.bottom),
+        Offset(tickX, plotRect.bottom + 6),
+        tickPaint,
+      );
 
-  TextPainter _textPainter(String text, TextStyle style) {
-    return TextPainter(
-      text: TextSpan(text: text, style: style),
-      textDirection: TextDirection.ltr,
-    );
-  }
+      final label = tick.toStringAsFixed(0);
+      final tp = TextPainter(
+        text: TextSpan(text: label, style: textStyle),
+        textDirection: TextDirection.ltr,
+      )..layout();
 
-  void _drawText(Canvas canvas, Offset offset, String text, TextStyle style) {
-    final tp = _textPainter(text, style)..layout();
-    tp.paint(canvas, offset);
+      double dx = tickX - tp.width / 2;
+      if ((tick - xMin).abs() < eps) dx = plotRect.left;
+      if ((tick - xMax).abs() < eps) dx = plotRect.right - tp.width;
+
+      tp.paint(canvas, Offset(dx, plotRect.bottom + 8));
+    }
   }
 
   @override
   bool shouldRepaint(covariant _LineChartPainter oldDelegate) {
-    return oldDelegate.x != x ||
-        oldDelegate.y != y ||
-        oldDelegate.lineColor != lineColor ||
-        oldDelegate.gridColor != gridColor ||
-        oldDelegate.textStyle != textStyle ||
-        oldDelegate.yMinOverride != yMinOverride ||
-        oldDelegate.yMaxOverride != yMaxOverride;
+    return true;
   }
 }
