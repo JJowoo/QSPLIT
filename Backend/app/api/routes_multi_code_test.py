@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Body, BackgroundTasks
+from pydantic import BaseModel
 from app.services.runner_service import run_qnn_inference, log_to_queue, CodeLoadError, ConfigError
 from app.services.generate_dummy import generate_dummy_variants
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 import asyncio
 from app.services.log_broadcaster import log_broadcaster  # 공용 broadcaster
 import json
@@ -119,21 +120,32 @@ def _worker_run_single_dummy(job: Dict[str, Any]) -> Dict[str, Any]:
             # "traceback": traceback.format_exc(),
         }
 
-@router.get("/run-multi-test")
-def run_multi_test(
-    target_parts: List[str] = Query(default=["encoder"]),
-    n_qubits: int = 6,
-    variant_count: int = 3,
-    sample_count: int = 10,
-    train_epochs: int = 5,
-    max_concurrent: int = 3,   # 추가: 동시에 돌릴 더미 수
-    depth: int = 2,            # PQC 레이어 깊이
-    run_id: str | None = None,
+class MultiTestRequest(BaseModel):
+    target_parts: List[str] = ["encoder"]
+    n_qubits: int = 6
+    variant_count: int = 3
+    sample_count: int = 10
+    train_epochs: int = 5
+    max_concurrent: int = 6
+    depth: int = 2
+    run_id: Optional[str] = None
+
+def _run_multi_test_background(
+    target_parts: List[str],
+    n_qubits: int,
+    variant_count: int,
+    sample_count: int,
+    train_epochs: int,
+    max_concurrent: int,
+    depth: int,
+    run_id: str
 ):
     base_dir = Path("generated_code").resolve()
     upload_dir = base_dir / "upload"
     results: List[Dict[str, Any]] = []
-    run_id = run_id or str(uuid.uuid4())
+
+    # Normalize 'se' to 'encoder'
+    target_parts = ["encoder" if p == "se" else p for p in target_parts]
 
     all_parts = {"encoder", "pqc", "mea"}
     selected_parts = set(target_parts)
@@ -191,7 +203,7 @@ def run_multi_test(
             "sample_count": sample_count,
             "file_map": combined_map_str,
             "target_parts": target_parts,
-            "save_dir": "./trained_weights",
+            "save_dir": f"./generated_code/trained_weights/dummy_{dummy_id}",
             "train_epochs": train_epochs,
             "run_id": run_id,
         })
@@ -238,7 +250,6 @@ def run_multi_test(
                     # 완료 로그(원하면 형식 변경 가능)
                     if out.get("status") == "ok":
                         log_to_queue({
-                            "run_id": run_id,
                             "message": f"[Dummy {dummy_id}] Done. Train Acc={out.get('max_train_acc',0.0):.3f}, Test Acc={out.get('accuracy',0.0):.3f}, train={out.get('train_seconds',0.0):.2f}s"
                         })
 
@@ -251,4 +262,28 @@ def run_multi_test(
 
     # 5) 응답은 dummy_id 순으로 정렬해서 프론트가 보기 좋게
     results.sort(key=lambda x: x["dummy_id"])
-    return {"run_id": run_id, "total_variants": variant_count, "results": results}
+    
+    # 웹소켓으로 결과 전송
+    log_to_queue({
+        "type": "multi_test_finished",
+        "run_id": run_id,
+        "results": results
+    })
+
+@router.post("/run-multi-test")
+def run_multi_test(req: MultiTestRequest, background_tasks: BackgroundTasks):
+    run_id = req.run_id or str(uuid.uuid4())
+    
+    background_tasks.add_task(
+        _run_multi_test_background,
+        req.target_parts,
+        req.n_qubits,
+        req.variant_count,
+        req.sample_count,
+        req.train_epochs,
+        req.max_concurrent,
+        req.depth,
+        run_id
+    )
+    
+    return {"status": "started", "run_id": run_id}

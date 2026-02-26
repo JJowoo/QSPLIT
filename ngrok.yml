@@ -1,0 +1,8 @@
+version: "2"
+tunnels:
+  qsplit-backend:
+    proto: http
+    addr: 8002
+  qsplit-frontend:
+    proto: http
+    addr: 8003

@@ -1,0 +1,533 @@
+INFO:     Will watch for changes in these directories: ['/home/mulsoap0504/workspace/QSPLIT/Backend']
+INFO:     Uvicorn running on http://0.0.0.0:8002 (Press CTRL+C to quit)
+INFO:     Started reloader process [1468718] using WatchFiles
+INFO:     Started server process [1468721]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     2406:5900:102a:d09c:407e:4127:a6db:7b4a:0 - "WebSocket /ws/logs" [accepted]
+[LogBroadcaster] Started listening to log_queue...
+INFO:     2406:5900:102a:d09c:407e:4127:a6db:7b4a:0 - "OPTIONS /generate-code?n_qubits=6&variant_count=5&depth=1 HTTP/1.1" 200 OK
+INFO:     connection open
+INFO:     2406:5900:102a:d09c:407e:4127:a6db:7b4a:0 - "GET /generate-code?n_qubits=6&variant_count=5&depth=1 HTTP/1.1" 200 OK
+INFO:     connection closed
+INFO:     2406:5900:102a:d09c:407e:4127:a6db:7b4a:0 - "WebSocket /ws/logs" [accepted]
+INFO:     connection open
+[WebSocket] Client disconnected
+INFO:     2406:5900:102a:d09c:407e:4127:a6db:7b4a:0 - "OPTIONS /run-multi-test HTTP/1.1" 200 OK
+INFO:     2406:5900:102a:d09c:407e:4127:a6db:7b4a:0 - "POST /run-multi-test HTTP/1.1" 200 OK
+/home/mulsoap0504/miniconda3/envs/qsplit/lib/python3.10/site-packages/torch/cuda/__init__.py:716: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+/home/mulsoap0504/miniconda3/envs/qsplit/lib/python3.10/site-packages/torch/cuda/__init__.py:716: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+/home/mulsoap0504/miniconda3/envs/qsplit/lib/python3.10/site-packages/torch/cuda/__init__.py:716: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+/home/mulsoap0504/miniconda3/envs/qsplit/lib/python3.10/site-packages/torch/cuda/__init__.py:716: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+/home/mulsoap0504/miniconda3/envs/qsplit/lib/python3.10/site-packages/torch/cuda/__init__.py:716: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+Loaded encoder: /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/ENCODER6QDummy4.py
+Loaded pqc:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/PQC6QDummy4.py
+Loaded mea:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/MEA6QDummy4.py
+[Dummy 5] Using device: cuda:0
+device: cuda:0
+[DEBUG] encoder has no trainable parameters.
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+num_classes: 9
+output shape: torch.Size([100, 9])
+labels min/max: 0 8
+[CUDA] device: cuda:0
+[CUDA] encoder param device: cuda:0
+[CUDA] inputs device: cuda:0
+[CUDA] one forward sec: 0.04041134612634778
+[Dummy 5] Epoch 1 Step 500: Loss=2.2203, Acc=0.1393
+[Dummy 5] Epoch 1: Loss=2.1990, Acc=0.1465
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+Loaded encoder: /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/ENCODER6QDummy0.py
+Loaded pqc:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/PQC6QDummy0.py
+Loaded mea:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/MEA6QDummy0.py
+[Dummy 1] Using device: cuda:0
+device: cuda:0
+[DEBUG] encoder has no trainable parameters.
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+num_classes: 9
+output shape: torch.Size([100, 9])
+labels min/max: 0 8
+[CUDA] device: cuda:0
+[CUDA] encoder param device: cuda:0
+[CUDA] inputs device: cuda:0
+[CUDA] one forward sec: 0.010788965970277786
+[Dummy 1] Epoch 1 Step 500: Loss=2.1957, Acc=0.1367
+[Dummy 1] Epoch 1: Loss=2.1914, Acc=0.1340
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+Loaded encoder: /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/ENCODER6QDummy3.py
+Loaded pqc:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/PQC6QDummy3.py
+Loaded mea:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/MEA6QDummy3.py
+[Dummy 4] Using device: cuda:0
+device: cuda:0
+[DEBUG] encoder has no trainable parameters.
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+num_classes: 9
+output shape: torch.Size([100, 9])
+labels min/max: 0 8
+[CUDA] device: cuda:0
+[CUDA] encoder param device: cuda:0
+[CUDA] inputs device: cuda:0
+[CUDA] one forward sec: 0.01626214594580233
+[Dummy 4] Epoch 1 Step 500: Loss=2.1960, Acc=0.1378
+[Dummy 4] Epoch 1: Loss=2.1914, Acc=0.1365
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+Loaded encoder: /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/ENCODER6QDummy1.py
+Loaded pqc:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/PQC6QDummy1.py
+Loaded mea:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/MEA6QDummy1.py
+[Dummy 2] Using device: cuda:0
+device: cuda:0
+[DEBUG] encoder has no trainable parameters.
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+num_classes: 9
+output shape: torch.Size([100, 9])
+labels min/max: 0 8
+[CUDA] device: cuda:0
+[CUDA] encoder param device: cuda:0
+[CUDA] inputs device: cuda:0
+[CUDA] one forward sec: 0.012850207043811679
+[Dummy 2] Epoch 1 Step 500: Loss=2.1891, Acc=0.1471
+[Dummy 2] Epoch 1: Loss=2.1861, Acc=0.1455
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+Loaded encoder: /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/ENCODER6QDummy2.py
+Loaded pqc:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/PQC6QDummy2.py
+Loaded mea:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/MEA6QDummy2.py
+[Dummy 3] Using device: cuda:0
+device: cuda:0
+[DEBUG] encoder has no trainable parameters.
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+num_classes: 9
+output shape: torch.Size([100, 9])
+labels min/max: 0 8
+[CUDA] device: cuda:0
+[CUDA] encoder param device: cuda:0
+[CUDA] inputs device: cuda:0
+[CUDA] one forward sec: 0.01194006996229291
+[Dummy 3] Epoch 1 Step 500: Loss=2.1804, Acc=0.1404
+[Dummy 3] Epoch 1: Loss=2.1774, Acc=0.1424
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+INFO:     connection closed
+INFO:     2406:5900:102a:d09c:407e:4127:a6db:7b4a:0 - "WebSocket /ws/logs" [accepted]
+[WebSocket] Client disconnected
+INFO:     2406:5900:102a:d09c:407e:4127:a6db:7b4a:0 - "OPTIONS /generate-code?n_qubits=6&variant_count=5&depth=1&target_parts=encoder HTTP/1.1" 200 OK
+INFO:     connection open
+INFO:     2406:5900:102a:d09c:407e:4127:a6db:7b4a:0 - "GET /generate-code?n_qubits=6&variant_count=5&depth=1&target_parts=encoder HTTP/1.1" 200 OK
+INFO:     connection closed
+INFO:     2406:5900:102a:d09c:407e:4127:a6db:7b4a:0 - "WebSocket /ws/logs" [accepted]
+INFO:     connection open
+[WebSocket] Client disconnected
+INFO:     2406:5900:102a:d09c:407e:4127:a6db:7b4a:0 - "GET /generate-code?n_qubits=6&variant_count=5&depth=1&target_parts=encoder HTTP/1.1" 200 OK
+INFO:     2406:5900:102a:d09c:407e:4127:a6db:7b4a:0 - "WebSocket /ws/logs" [accepted]
+INFO:     connection open
+INFO:     2406:5900:102a:d09c:407e:4127:a6db:7b4a:0 - "GET /generate-code?n_qubits=6&variant_count=5&depth=1&target_parts=encoder HTTP/1.1" 200 OK
+INFO:     connection closed
+INFO:     connection closed
+INFO:     2406:5900:102a:d09c:407e:4127:a6db:7b4a:0 - "WebSocket /ws/logs" [accepted]
+[WebSocket] Client disconnected
+[WebSocket] Client disconnected
+INFO:     2406:5900:102a:d09c:407e:4127:a6db:7b4a:0 - "OPTIONS /generate-code?n_qubits=6&variant_count=5&depth=1 HTTP/1.1" 200 OK
+INFO:     connection open
+INFO:     2406:5900:102a:d09c:407e:4127:a6db:7b4a:0 - "GET /generate-code?n_qubits=6&variant_count=5&depth=1 HTTP/1.1" 200 OK
+INFO:     connection closed
+[WebSocket] Client disconnected
+INFO:     2406:5900:102a:d09c:407e:4127:a6db:7b4a:0 - "OPTIONS /run-multi-test HTTP/1.1" 200 OK
+INFO:     2406:5900:102a:d09c:407e:4127:a6db:7b4a:0 - "POST /run-multi-test HTTP/1.1" 200 OK
+INFO:     2406:5900:102a:d09c:407e:4127:a6db:7b4a:0 - "WebSocket /ws/logs" [accepted]
+INFO:     connection open
+/home/mulsoap0504/miniconda3/envs/qsplit/lib/python3.10/site-packages/torch/cuda/__init__.py:716: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+/home/mulsoap0504/miniconda3/envs/qsplit/lib/python3.10/site-packages/torch/cuda/__init__.py:716: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+/home/mulsoap0504/miniconda3/envs/qsplit/lib/python3.10/site-packages/torch/cuda/__init__.py:716: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+/home/mulsoap0504/miniconda3/envs/qsplit/lib/python3.10/site-packages/torch/cuda/__init__.py:716: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+/home/mulsoap0504/miniconda3/envs/qsplit/lib/python3.10/site-packages/torch/cuda/__init__.py:716: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+Loaded encoder: /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/ENCODER6QDummy3.py
+Loaded pqc:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/PQC6QDummy3.py
+Loaded mea:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/MEA6QDummy3.py
+[Dummy 4] Using device: cuda:0
+device: cuda:0
+[DEBUG] encoder has no trainable parameters.
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+num_classes: 9
+output shape: torch.Size([100, 9])
+labels min/max: 0 8
+[CUDA] device: cuda:0
+[CUDA] encoder param device: cuda:0
+[CUDA] inputs device: cuda:0
+[CUDA] one forward sec: 0.006981510203331709
+[Dummy 4] Epoch 1 Step 500: Loss=2.1959, Acc=0.1377
+[Dummy 4] Epoch 1: Loss=2.1916, Acc=0.1361
+[Dummy 4] Epoch 2 Step 500: Loss=2.1854, Acc=0.1345
+[Dummy 4] Epoch 2: Loss=2.1849, Acc=0.1346
+[Dummy 4] Epoch 3 Step 500: Loss=2.1843, Acc=0.1305
+[Dummy 4] Epoch 3: Loss=2.1845, Acc=0.1310
+[Dummy 4] Epoch 4 Step 500: Loss=2.1836, Acc=0.1327
+[Dummy 4] Epoch 4: Loss=2.1844, Acc=0.1318
+[Dummy 4] Epoch 5 Step 500: Loss=2.1842, Acc=0.1333
+[Dummy 4] Epoch 5: Loss=2.1843, Acc=0.1314
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+Loaded encoder: /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/ENCODER6QDummy4.py
+Loaded pqc:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/PQC6QDummy4.py
+Loaded mea:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/MEA6QDummy4.py
+[Dummy 5] Using device: cuda:0
+device: cuda:0
+[DEBUG] encoder has no trainable parameters.
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+num_classes: 9
+output shape: torch.Size([100, 9])
+labels min/max: 0 8
+[CUDA] device: cuda:0
+[CUDA] encoder param device: cuda:0
+[CUDA] inputs device: cuda:0
+[CUDA] one forward sec: 0.02052183519117534
+[Dummy 5] Epoch 1 Step 500: Loss=2.2089, Acc=0.1296
+[Dummy 5] Epoch 1: Loss=2.1980, Acc=0.1337
+[Dummy 5] Epoch 2 Step 500: Loss=2.1794, Acc=0.1426
+[Dummy 5] Epoch 2: Loss=2.1766, Acc=0.1420
+[Dummy 5] Epoch 3 Step 500: Loss=2.1681, Acc=0.1423
+[Dummy 5] Epoch 3: Loss=2.1664, Acc=0.1434
+[Dummy 5] Epoch 4 Step 500: Loss=2.1590, Acc=0.1481
+[Dummy 5] Epoch 4: Loss=2.1571, Acc=0.1494
+[Dummy 5] Epoch 5 Step 500: Loss=2.1510, Acc=0.1592
+[Dummy 5] Epoch 5: Loss=2.1487, Acc=0.1635
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+Loaded encoder: /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/ENCODER6QDummy0.py
+Loaded pqc:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/PQC6QDummy0.py
+Loaded mea:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/MEA6QDummy0.py
+[Dummy 1] Using device: cuda:0
+device: cuda:0
+[DEBUG] encoder has no trainable parameters.
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+num_classes: 9
+output shape: torch.Size([100, 9])
+labels min/max: 0 8
+[CUDA] device: cuda:0
+[CUDA] encoder param device: cuda:0
+[CUDA] inputs device: cuda:0
+[CUDA] one forward sec: 0.007910274202004075
+[Dummy 1] Epoch 1 Step 500: Loss=2.2023, Acc=0.1035
+[Dummy 1] Epoch 1: Loss=2.1943, Acc=0.1186
+[Dummy 1] Epoch 2 Step 500: Loss=2.1836, Acc=0.1558
+[Dummy 1] Epoch 2: Loss=2.1816, Acc=0.1620
+[Dummy 1] Epoch 3 Step 500: Loss=2.1773, Acc=0.1789
+[Dummy 1] Epoch 3: Loss=2.1766, Acc=0.1784
+[Dummy 1] Epoch 4 Step 500: Loss=2.1714, Acc=0.1855
+[Dummy 1] Epoch 4: Loss=2.1707, Acc=0.1859
+[Dummy 1] Epoch 5 Step 500: Loss=2.1662, Acc=0.1886
+[Dummy 1] Epoch 5: Loss=2.1645, Acc=0.1907
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+Loaded encoder: /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/ENCODER6QDummy2.py
+Loaded pqc:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/PQC6QDummy2.py
+Loaded mea:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/MEA6QDummy2.py
+[Dummy 3] Using device: cuda:0
+device: cuda:0
+[DEBUG] encoder has no trainable parameters.
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+num_classes: 9
+output shape: torch.Size([100, 9])
+labels min/max: 0 8
+[CUDA] device: cuda:0
+[CUDA] encoder param device: cuda:0
+[CUDA] inputs device: cuda:0
+[CUDA] one forward sec: 0.015037717064842582
+[Dummy 3] Epoch 1 Step 500: Loss=2.1975, Acc=0.1373
+[Dummy 3] Epoch 1: Loss=2.1934, Acc=0.1374
+[Dummy 3] Epoch 2 Step 500: Loss=2.1838, Acc=0.1407
+[Dummy 3] Epoch 2: Loss=2.1826, Acc=0.1420
+[Dummy 3] Epoch 3 Step 500: Loss=2.1778, Acc=0.1416
+[Dummy 3] Epoch 3: Loss=2.1769, Acc=0.1426
+[Dummy 3] Epoch 4 Step 500: Loss=2.1731, Acc=0.1461
+[Dummy 3] Epoch 4: Loss=2.1717, Acc=0.1473
+[Dummy 3] Epoch 5 Step 500: Loss=2.1677, Acc=0.1483
+[Dummy 3] Epoch 5: Loss=2.1666, Acc=0.1495
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+Loaded encoder: /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/ENCODER6QDummy1.py
+Loaded pqc:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/PQC6QDummy1.py
+Loaded mea:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/MEA6QDummy1.py
+[Dummy 2] Using device: cuda:0
+device: cuda:0
+[DEBUG] encoder has no trainable parameters.
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+num_classes: 9
+output shape: torch.Size([100, 9])
+labels min/max: 0 8
+[CUDA] device: cuda:0
+[CUDA] encoder param device: cuda:0
+[CUDA] inputs device: cuda:0
+[CUDA] one forward sec: 0.012410877970978618
+[Dummy 2] Epoch 1 Step 500: Loss=2.1908, Acc=0.1385
+[Dummy 2] Epoch 1: Loss=2.1850, Acc=0.1397
+[Dummy 2] Epoch 2 Step 500: Loss=2.1741, Acc=0.1449
+[Dummy 2] Epoch 2: Loss=2.1739, Acc=0.1439
+[Dummy 2] Epoch 3 Step 500: Loss=2.1696, Acc=0.1481
+[Dummy 2] Epoch 3: Loss=2.1689, Acc=0.1472
+[Dummy 2] Epoch 4 Step 500: Loss=2.1653, Acc=0.1479
+[Dummy 2] Epoch 4: Loss=2.1638, Acc=0.1502
+[Dummy 2] Epoch 5 Step 500: Loss=2.1601, Acc=0.1492
+[Dummy 2] Epoch 5: Loss=2.1591, Acc=0.1536
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+INFO:     connection closed
+INFO:     2406:5900:102a:d09c:bcc2:586c:ba99:a051:0 - "WebSocket /ws/logs" [accepted]
+INFO:     connection open
+[WebSocket] Client disconnected
+INFO:     2406:5900:102a:d09c:bcc2:586c:ba99:a051:0 - "OPTIONS /generate-code?n_qubits=6&variant_count=5&depth=1 HTTP/1.1" 200 OK
+INFO:     2406:5900:102a:d09c:bcc2:586c:ba99:a051:0 - "GET /generate-code?n_qubits=6&variant_count=5&depth=1 HTTP/1.1" 200 OK
+INFO:     connection closed
+[WebSocket] Client disconnected
+INFO:     2406:5900:102a:d09c:bcc2:586c:ba99:a051:0 - "GET /generate-code?n_qubits=6&variant_count=5&depth=1 HTTP/1.1" 200 OK
+INFO:     2406:5900:102a:d09c:bcc2:586c:ba99:a051:0 - "WebSocket /ws/logs" [accepted]
+INFO:     connection open
+INFO:     2406:5900:102a:d09c:bcc2:586c:ba99:a051:0 - "OPTIONS /run-multi-test HTTP/1.1" 200 OK
+INFO:     connection closed
+INFO:     2406:5900:102a:d09c:bcc2:586c:ba99:a051:0 - "WebSocket /ws/logs" [accepted]
+INFO:     connection open
+[WebSocket] Client disconnected
+INFO:     2406:5900:102a:d09c:bcc2:586c:ba99:a051:0 - "POST /run-multi-test HTTP/1.1" 200 OK
+/home/mulsoap0504/miniconda3/envs/qsplit/lib/python3.10/site-packages/torch/cuda/__init__.py:716: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+/home/mulsoap0504/miniconda3/envs/qsplit/lib/python3.10/site-packages/torch/cuda/__init__.py:716: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+/home/mulsoap0504/miniconda3/envs/qsplit/lib/python3.10/site-packages/torch/cuda/__init__.py:716: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+/home/mulsoap0504/miniconda3/envs/qsplit/lib/python3.10/site-packages/torch/cuda/__init__.py:716: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+/home/mulsoap0504/miniconda3/envs/qsplit/lib/python3.10/site-packages/torch/cuda/__init__.py:716: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+Loaded encoder: /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/ENCODER6QDummy3.py
+Loaded pqc:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/PQC6QDummy3.py
+Loaded mea:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/MEA6QDummy3.py
+[Dummy 4] Using device: cuda:0
+device: cuda:0
+[DEBUG] encoder has no trainable parameters.
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+num_classes: 9
+output shape: torch.Size([100, 9])
+labels min/max: 0 8
+[CUDA] device: cuda:0
+[CUDA] encoder param device: cuda:0
+[CUDA] inputs device: cuda:0
+[CUDA] one forward sec: 0.01670755399391055
+[Dummy 4] Epoch 1 Step 500: Loss=2.2047, Acc=0.1245
+[Dummy 4] Epoch 1: Loss=2.1970, Acc=0.1322
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+Loaded encoder: /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/ENCODER6QDummy4.py
+Loaded pqc:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/PQC6QDummy4.py
+Loaded mea:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/MEA6QDummy4.py
+[Dummy 5] Using device: cuda:0
+device: cuda:0
+[DEBUG] encoder has no trainable parameters.
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+num_classes: 9
+output shape: torch.Size([100, 9])
+labels min/max: 0 8
+[CUDA] device: cuda:0
+[CUDA] encoder param device: cuda:0
+[CUDA] inputs device: cuda:0
+[CUDA] one forward sec: 0.010713100899010897
+[Dummy 5] Epoch 1 Step 500: Loss=2.1848, Acc=0.1457
+[Dummy 5] Epoch 1: Loss=2.1805, Acc=0.1493
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+Loaded encoder: /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/ENCODER6QDummy0.py
+Loaded pqc:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/PQC6QDummy0.py
+Loaded mea:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/MEA6QDummy0.py
+[Dummy 1] Using device: cuda:0
+device: cuda:0
+[DEBUG] encoder has no trainable parameters.
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+num_classes: 9
+output shape: torch.Size([100, 9])
+labels min/max: 0 8
+[CUDA] device: cuda:0
+[CUDA] encoder param device: cuda:0
+[CUDA] inputs device: cuda:0
+[CUDA] one forward sec: 0.006343829212710261
+[Dummy 1] Epoch 1 Step 500: Loss=2.1891, Acc=0.1305
+[Dummy 1] Epoch 1: Loss=2.1865, Acc=0.1391
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+Loaded encoder: /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/ENCODER6QDummy1.py
+Loaded pqc:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/PQC6QDummy1.py
+Loaded mea:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/MEA6QDummy1.py
+[Dummy 2] Using device: cuda:0
+device: cuda:0
+[DEBUG] encoder has no trainable parameters.
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+num_classes: 9
+output shape: torch.Size([100, 9])
+labels min/max: 0 8
+[CUDA] device: cuda:0
+[CUDA] encoder param device: cuda:0
+[CUDA] inputs device: cuda:0
+[CUDA] one forward sec: 0.02568820514716208
+[Dummy 2] Epoch 1 Step 500: Loss=2.1963, Acc=0.1426
+[Dummy 2] Epoch 1: Loss=2.1901, Acc=0.1426
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+Loaded encoder: /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/ENCODER6QDummy2.py
+Loaded pqc:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/PQC6QDummy2.py
+Loaded mea:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/MEA6QDummy2.py
+[Dummy 3] Using device: cuda:0
+device: cuda:0
+[DEBUG] encoder has no trainable parameters.
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+num_classes: 9
+output shape: torch.Size([100, 9])
+labels min/max: 0 8
+[CUDA] device: cuda:0
+[CUDA] encoder param device: cuda:0
+[CUDA] inputs device: cuda:0
+[CUDA] one forward sec: 0.019108933862298727
+[Dummy 3] Epoch 1 Step 500: Loss=2.2073, Acc=0.1316
+[Dummy 3] Epoch 1: Loss=2.1937, Acc=0.1362
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+INFO:     connection closed
+[WebSocket] Client disconnected
+INFO:     20.193.233.248:0 - "GET / HTTP/1.1" 404 Not Found
+INFO:     20.193.233.253:0 - "GET / HTTP/1.1" 404 Not Found
+INFO:     165.194.27.79:0 - "GET / HTTP/1.1" 404 Not Found
+INFO:     165.194.27.79:0 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     165.194.27.79:0 - "GET /docs HTTP/1.1" 200 OK
+INFO:     165.194.27.79:0 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     165.194.27.79:0 - "GET /docs HTTP/1.1" 200 OK
+INFO:     165.194.27.79:0 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     165.194.27.79:0 - "OPTIONS /generate-code?n_qubits=6&variant_count=1&depth=1 HTTP/1.1" 200 OK
+INFO:     165.194.27.79:0 - "WebSocket /ws/logs" [accepted]
+INFO:     connection open
+INFO:     165.194.27.79:0 - "GET /generate-code?n_qubits=6&variant_count=1&depth=1 HTTP/1.1" 200 OK
+INFO:     165.194.27.79:0 - "OPTIONS /run-multi-test HTTP/1.1" 200 OK
+INFO:     connection closed
+INFO:     165.194.27.79:0 - "WebSocket /ws/logs" [accepted]
+INFO:     connection open
+[WebSocket] Client disconnected
+INFO:     165.194.27.79:0 - "POST /run-multi-test HTTP/1.1" 200 OK
+/home/mulsoap0504/miniconda3/envs/qsplit/lib/python3.10/site-packages/torch/cuda/__init__.py:716: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+INFO:     connection closed
+Loaded encoder: /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/ENCODER6QDummy0.py
+Loaded pqc:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/PQC6QDummy0.py
+Loaded mea:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/MEA6QDummy0.py
+[Dummy 1] Using device: cuda:0
+device: cuda:0
+[DEBUG] encoder has no trainable parameters.
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+num_classes: 9
+output shape: torch.Size([100, 9])
+labels min/max: 0 8
+[CUDA] device: cuda:0
+[CUDA] encoder param device: cuda:0
+[CUDA] inputs device: cuda:0
+[CUDA] one forward sec: 0.004426917992532253
+[Dummy 1] Epoch 1 Step 500: Loss=2.2034, Acc=0.1149
+[Dummy 1] Epoch 1: Loss=2.1956, Acc=0.1200
+[Dummy 1] Epoch 2 Step 500: Loss=2.1837, Acc=0.1334
+[Dummy 1] Epoch 2: Loss=2.1831, Acc=0.1428
+[Dummy 1] Epoch 3 Step 500: Loss=2.1795, Acc=0.1617
+[Dummy 1] Epoch 3: Loss=2.1778, Acc=0.1678
+[Dummy 1] Epoch 4 Step 500: Loss=2.1723, Acc=0.1820
+[Dummy 1] Epoch 4: Loss=2.1712, Acc=0.1823
+[Dummy 1] Epoch 5 Step 500: Loss=2.1667, Acc=0.1861
+[Dummy 1] Epoch 5: Loss=2.1647, Acc=0.1880
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+[WebSocket] Client disconnected
+INFO:     165.194.27.79:0 - "OPTIONS /generate-code?n_qubits=6&variant_count=5&depth=1&target_parts=encoder HTTP/1.1" 200 OK
+INFO:     165.194.27.79:0 - "WebSocket /ws/logs" [accepted]
+INFO:     connection open
+INFO:     165.194.27.79:0 - "GET /generate-code?n_qubits=6&variant_count=5&depth=1&target_parts=encoder HTTP/1.1" 200 OK
+INFO:     connection closed
+[WebSocket] Client disconnected
+INFO:     165.194.27.79:0 - "OPTIONS /generate-code?n_qubits=6&variant_count=1&depth=1 HTTP/1.1" 200 OK
+INFO:     165.194.27.79:0 - "WebSocket /ws/logs" [accepted]
+INFO:     connection open
+INFO:     165.194.27.79:0 - "GET /generate-code?n_qubits=6&variant_count=1&depth=1 HTTP/1.1" 200 OK
+INFO:     connection closed
+[WebSocket] Client disconnected
+INFO:     165.194.27.79:0 - "OPTIONS /run-multi-test HTTP/1.1" 200 OK
+INFO:     165.194.27.79:0 - "WebSocket /ws/logs" [accepted]
+INFO:     connection open
+INFO:     165.194.27.79:0 - "POST /run-multi-test HTTP/1.1" 200 OK
+/home/mulsoap0504/miniconda3/envs/qsplit/lib/python3.10/site-packages/torch/cuda/__init__.py:716: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+Loaded encoder: /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/ENCODER6QDummy0.py
+Loaded pqc:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/PQC6QDummy0.py
+Loaded mea:     /home/mulsoap0504/workspace/QSPLIT/Backend/generated_code/MEA6QDummy0.py
+[Dummy 1] Using device: cuda:0
+device: cuda:0
+[DEBUG] encoder has no trainable parameters.
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+num_classes: 9
+output shape: torch.Size([100, 9])
+labels min/max: 0 8
+[CUDA] device: cuda:0
+[CUDA] encoder param device: cuda:0
+[CUDA] inputs device: cuda:0
+[CUDA] one forward sec: 0.004672160372138023
+[Dummy 1] Epoch 1 Step 500: Loss=2.1903, Acc=0.1351
+[Dummy 1] Epoch 1: Loss=2.1870, Acc=0.1411
+[Dummy 1] Epoch 2 Step 500: Loss=2.1797, Acc=0.1746
+[Dummy 1] Epoch 2: Loss=2.1779, Acc=0.1751
+[Dummy 1] Epoch 3 Step 500: Loss=2.1714, Acc=0.1838
+[Dummy 1] Epoch 3: Loss=2.1710, Acc=0.1819
+[Dummy 1] Epoch 4 Step 500: Loss=2.1663, Acc=0.1863
+[Dummy 1] Epoch 4: Loss=2.1644, Acc=0.1876
+[Dummy 1] Epoch 5 Step 500: Loss=2.1598, Acc=0.1912
+[Dummy 1] Epoch 5: Loss=2.1584, Acc=0.1912
+Using downloaded and verified file: /home/mulsoap0504/.medmnist/pathmnist.npz
+INFO:     121.133.84.161:0 - "WebSocket /ws/logs" [accepted]
+INFO:     connection open
+INFO:     121.133.84.161:0 - "OPTIONS /generate-code?n_qubits=6&variant_count=5&depth=1&target_parts=encoder HTTP/1.1" 200 OK
+INFO:     121.133.84.161:0 - "GET /generate-code?n_qubits=6&variant_count=5&depth=1&target_parts=encoder HTTP/1.1" 200 OK
+INFO:     connection closed
+[WebSocket] Client disconnected
+INFO:     121.133.84.161:0 - "OPTIONS /run-multi-test HTTP/1.1" 200 OK
+INFO:     121.133.84.161:0 - "WebSocket /ws/logs" [accepted]
+INFO:     connection open
+INFO:     121.133.84.161:0 - "POST /run-multi-test HTTP/1.1" 200 OK
+INFO:     connection closed
+[WebSocket] Client disconnected
+INFO:     121.133.84.161:0 - "POST /run-multi-test HTTP/1.1" 200 OK
+INFO:     121.133.84.161:0 - "WebSocket /ws/logs" [accepted]
+INFO:     connection open
+/home/mulsoap0504/miniconda3/envs/qsplit/lib/python3.10/site-packages/torch/cuda/__init__.py:716: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+/home/mulsoap0504/miniconda3/envs/qsplit/lib/python3.10/site-packages/torch/cuda/__init__.py:716: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+/home/mulsoap0504/miniconda3/envs/qsplit/lib/python3.10/site-packages/torch/cuda/__init__.py:716: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+/home/mulsoap0504/miniconda3/envs/qsplit/lib/python3.10/site-packages/torch/cuda/__init__.py:716: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+/home/mulsoap0504/miniconda3/envs/qsplit/lib/python3.10/site-packages/torch/cuda/__init__.py:716: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+/home/mulsoap0504/miniconda3/envs/qsplit/lib/python3.10/site-packages/torch/cuda/__init__.py:716: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+INFO:     connection closed
+[WebSocket] Client disconnected
+INFO:     121.133.84.161:0 - "OPTIONS /generate-code?n_qubits=6&variant_count=5&depth=1 HTTP/1.1" 200 OK
+INFO:     121.133.84.161:0 - "WebSocket /ws/logs" [accepted]
+INFO:     connection open
+INFO:     121.133.84.161:0 - "GET /generate-code?n_qubits=6&variant_count=5&depth=1 HTTP/1.1" 200 OK
+/home/mulsoap0504/miniconda3/envs/qsplit/lib/python3.10/site-packages/torch/cuda/__init__.py:716: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+/home/mulsoap0504/miniconda3/envs/qsplit/lib/python3.10/site-packages/torch/cuda/__init__.py:716: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+/home/mulsoap0504/miniconda3/envs/qsplit/lib/python3.10/site-packages/torch/cuda/__init__.py:716: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+INFO:     connection closed
+[WebSocket] Client disconnected
+INFO:     121.133.84.161:0 - "POST /run-multi-test HTTP/1.1" 200 OK
+INFO:     121.133.84.161:0 - "WebSocket /ws/logs" [accepted]
+INFO:     connection open
+/home/mulsoap0504/miniconda3/envs/qsplit/lib/python3.10/site-packages/torch/cuda/__init__.py:716: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+/home/mulsoap0504/miniconda3/envs/qsplit/lib/python3.10/site-packages/torch/cuda/__init__.py:716: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+/home/mulsoap0504/miniconda3/envs/qsplit/lib/python3.10/site-packages/torch/cuda/__init__.py:716: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+/home/mulsoap0504/miniconda3/envs/qsplit/lib/python3.10/site-packages/torch/cuda/__init__.py:716: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+/home/mulsoap0504/miniconda3/envs/qsplit/lib/python3.10/site-packages/torch/cuda/__init__.py:716: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")

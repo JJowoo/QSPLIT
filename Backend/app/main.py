@@ -3,7 +3,9 @@ from app.api import routes_code, routes_runner, routes_download, routes_upload
 from app.api.ws_logging import router as ws_logging_router
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.routes_multi_code_test import router as multi_test_router
-from app.api.routes_test_trained_weights import router as test_weights_router  
+from app.api.routes_test_trained_weights import router as test_weights_router
+import asyncio
+from app.services.log_broadcaster import log_broadcaster
 
 app = FastAPI()
 
@@ -14,6 +16,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.on_event("startup")
+async def startup_event():
+    asyncio.create_task(log_broadcaster.listen_to_queue())
 
 app.include_router(routes_code.router)
 # app.include_router(routes_runner.router)

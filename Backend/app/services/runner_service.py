@@ -18,6 +18,17 @@ from pathlib import Path
 from typing import Optional
 import ast
 import time
+import math
+
+def _safe_float(v) -> float:
+    """Convert value to float, replacing NaN/Inf with 0.0 or None-safe value."""
+    try:
+        f = float(v)
+        if math.isnan(f) or math.isinf(f):
+            return 0.0
+        return f
+    except (ValueError, TypeError):
+        return 0.0
 
 @dataclass
 class CodeLoadError(Exception):
@@ -468,13 +479,17 @@ def run_qnn_inference(
             avg_loss = total_loss / total if total else 0.0
             acc_train = correct / total if total else 0.0
             print(f"[Dummy {dummy_id}] Epoch {epoch+1}: Loss={avg_loss:.4f}, Acc={acc_train:.4f}")
-            last_train_loss = float(avg_loss)
-            last_train_acc = float(acc_train)
+            
+            safe_loss = _safe_float(avg_loss)
+            safe_acc = _safe_float(acc_train)
+            
+            last_train_loss = safe_loss
+            last_train_acc = safe_acc
 
             history.append({
                 "epoch": int(epoch + 1),
-                "train_loss": float(avg_loss),
-                "train_acc": float(acc_train),
+                "train_loss": safe_loss,
+                "train_acc": safe_acc,
             })
 
             if log_callback:
@@ -484,8 +499,8 @@ def run_qnn_inference(
                     "run_id": run_id,
                     "dummy_id": dummy_id,
                     "epoch": int(epoch + 1),
-                    "train_loss": float(avg_loss),
-                    "train_acc": float(acc_train),
+                    "train_loss": safe_loss,
+                    "train_acc": safe_acc,
                 })
                 log_callback({
                     "run_id": run_id,
@@ -538,6 +553,7 @@ def run_qnn_inference(
 
     inference_seconds = time.perf_counter() - t_inf_start
     acc = correct / total if total > 0 else 0.0   
+    safe_test_acc = _safe_float(acc)
 
     # if log_callback:
     #     log_callback({"run_id": run_id, "message": f"Inference complete. Accuracy: {acc:.3f}"})
@@ -560,18 +576,18 @@ def run_qnn_inference(
 
     if history:
         try:
-            max_train_acc = max(float(h.get("train_acc", 0.0)) for h in history)
+            max_train_acc = max(h.get("train_acc", 0.0) for h in history)
         except Exception:
             max_train_acc = None
 
     return {
-        "accuracy": acc,
-        "test_accuracy": acc,
+        "accuracy": safe_test_acc,
+        "test_accuracy": safe_test_acc,
         "train_loss": last_train_loss,
         "train_acc": last_train_acc,
         "max_train_acc": max_train_acc,
         "samples_evaluated": total,
         "results": results,
-        "train_seconds": float(train_seconds),
+        "train_seconds": _safe_float(train_seconds),
         "history": history
     }
