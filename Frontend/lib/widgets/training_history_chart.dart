@@ -112,8 +112,7 @@ class _ChartSection extends StatelessWidget {
                   x: x,
                   y: y,
                   lineColor: lineColor,
-                  gridColor:
-                      colorScheme.outlineVariant.withAlpha(179),
+                  gridColor: colorScheme.outlineVariant.withAlpha(179),
                   textStyle: chartTextStyle,
                   yMinOverride: yMinOverride,
                   yMaxOverride: yMaxOverride,
@@ -195,22 +194,18 @@ class _LineChartPainter extends CustomPainter {
       final t = i / 4.0;
       final yPos = plotRect.top + plotRect.height * t;
       canvas.drawLine(
-          Offset(plotRect.left, yPos),
-          Offset(plotRect.right, yPos),
-          gridPaint);
+          Offset(plotRect.left, yPos), Offset(plotRect.right, yPos), gridPaint);
     }
 
     canvas.drawRect(plotRect, gridPaint);
 
     double mapX(double xv) {
       if ((xMax - xMin).abs() < 1e-12) return plotRect.left;
-      return plotRect.left +
-          (xv - xMin) / (xMax - xMin) * plotRect.width;
+      return plotRect.left + (xv - xMin) / (xMax - xMin) * plotRect.width;
     }
 
     double mapY(double yv) {
-      return plotRect.bottom -
-          (yv - yMin) / (yMax - yMin) * plotRect.height;
+      return plotRect.bottom - (yv - yMin) / (yMax - yMin) * plotRect.height;
     }
 
     final path = Path();
@@ -223,6 +218,7 @@ class _LineChartPainter extends CustomPainter {
       }
     }
 
+    // 선 그리기
     canvas.drawPath(
         path,
         Paint()
@@ -230,17 +226,21 @@ class _LineChartPainter extends CustomPainter {
           ..strokeWidth = 2
           ..style = PaintingStyle.stroke);
 
+    // 🔥 추가된 부분: 데이터 포인트 원(Point) 그리기 (크기 3.0)
+    final pointPaint = Paint()
+      ..color = lineColor
+      ..style = PaintingStyle.fill;
+
+    for (var i = 0; i < x.length; i++) {
+      final p = Offset(mapX(x[i]), mapY(y[i]));
+      canvas.drawCircle(p, 3.0, pointPaint);
+    }
+
     // 🔥 Y축: ymin / ymax만 표시
-    _drawText(
-        canvas,
-        Offset(4, plotRect.top - 8),
-        yMax.toStringAsFixed(3),
+    _drawText(canvas, Offset(4, plotRect.top - 8), yMax.toStringAsFixed(3),
         textStyle);
 
-    _drawText(
-        canvas,
-        Offset(4, plotRect.bottom - 12),
-        yMin.toStringAsFixed(3),
+    _drawText(canvas, Offset(4, plotRect.bottom - 12), yMin.toStringAsFixed(3),
         textStyle);
 
     // X ticks (1,5,10,...)
@@ -283,8 +283,7 @@ class _LineChartPainter extends CustomPainter {
     }
   }
 
-  void _drawText(
-      Canvas canvas, Offset offset, String text, TextStyle style) {
+  void _drawText(Canvas canvas, Offset offset, String text, TextStyle style) {
     final tp = TextPainter(
       text: TextSpan(text: text, style: style),
       textDirection: TextDirection.ltr,
