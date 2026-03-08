@@ -124,12 +124,14 @@ class _QuantumHomePageState extends State<QuantumHomePage> {
         if (_activeRunId != null && runId.isNotEmpty && runId != _activeRunId) {
           return;
         }
+        String formattedMsg = msg.replaceAll('/home/dev/QSPLIT/softwarex', '..');
         setState(() {
-          log.add('WS: $msg');
+          log.add(formattedMsg);
         });
       } else {
+        String formattedMsg = message.toString().replaceAll('/home/dev/QSPLIT/softwarex', '..');
         setState(() {
-          log.add('WS: $message');
+          log.add(formattedMsg);
         });
       }
     }, onDone: () {
